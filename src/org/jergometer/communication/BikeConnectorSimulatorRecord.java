@@ -1,6 +1,5 @@
 package org.jergometer.communication;
 
-import gnu.io.UnsupportedCommOperationException;
 
 import java.io.IOException;
 
@@ -12,7 +11,7 @@ public class BikeConnectorSimulatorRecord extends KettlerBikeConnector {
 	private FileRecorder fileRecorder;
 
 	@Override
-	public void connect(String serialName, BikeListener listener) throws BikeException, UnsupportedCommOperationException, IOException {
+	public void connect(String serialName, BikeListener listener) throws BikeException, IOException {
 		super.connect(serialName, listener);
 		fileRecorder = new FileRecorder(BikeConnectorSimulatorReplay.SIMULATOR_SESSION);
 		reader.addBikeReaderListener(fileRecorder);

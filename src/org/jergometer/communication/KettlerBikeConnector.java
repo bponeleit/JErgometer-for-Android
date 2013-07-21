@@ -1,62 +1,68 @@
 package org.jergometer.communication;
 
-import gnu.io.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 
 import org.jergometer.translation.I18n;
 
+import android.content.Context;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
+
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
+
 /**
- * KettlerBikeConnector connects to the bike via serial port (e.g. RS232 or USB).
- * It is used to receive data from the bike and to control it.
+ * KettlerBikeConnector connects to the bike via serial port (e.g. RS232 or
+ * USB). It is used to receive data from the bike and to control it.
  */
 public class KettlerBikeConnector implements BikeConnector {
 
-// dynamic
+	// dynamic
 
-	private SerialPort serialPort;
+	private Context context = null;
+	private UsbSerialDriver mDriver = null;
 	public KettlerBikeReader reader = null;
 	public KettlerBikeWriter writer = null;
 	private int power;
 
-	public void connect(String serialName, BikeListener listener) throws BikeException, UnsupportedCommOperationException, IOException {
-		RXTXLibrary.init();
+	public void connect(String serialName, BikeListener listener) throws BikeException, IOException {
+		// Get UsbManager from Android.
+		UsbManager manager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+		List<UsbSerialDriver> mDrivers = null;
+		Map<String, UsbDevice> devices = manager.getDeviceList();
+		for (UsbDevice device : manager.getDeviceList().values()) {			
+			mDrivers = UsbSerialProber.probeSingleDevice(manager, device);
+		}
 
-		Enumeration portList = CommPortIdentifier.getPortIdentifiers();
-
-		while (portList.hasMoreElements()) {
-			CommPortIdentifier portId = (CommPortIdentifier) portList.nextElement();
-
-			if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-				if(portId.getName().equals(serialName)) {
-					if(portId.isCurrentlyOwned()) {
-						throw new BikeException(I18n.getString("msg.serial_port_used_by_the_following_application", portId.getCurrentOwner()));
-					}
-					try {
-						serialPort = (SerialPort) portId.open("JErgometer", 2000);
-					} catch (PortInUseException e) {
-						throw new BikeException(I18n.getString("msg.serial_port_used_by_the_following_application", portId.getCurrentOwner()));
-					}
-
-					connect(serialPort);
-				}
+		// Find the first available mDriver.
+		if (mDrivers != null) {
+			try {
+				mDriver = mDrivers.get(0);
+				connect(mDriver);
+			} catch (IndexOutOfBoundsException e) {
+				// TODO: handle exception
+				//mDumpTextView.append(e.toString() + "\n");
 			}
+		} else {
+			//mDumpTextView.append("No drivers found\n");
 		}
 		reader.addBikeReaderListener(listener);
 		reader.start();
 	}
 
-	public void connect(SerialPort serialPort) throws UnsupportedCommOperationException, IOException {
-		serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8,
-																	 SerialPort.STOPBITS_1,
-																	 SerialPort.PARITY_NONE);
+	public void connect(UsbSerialDriver serialPort) throws  IOException {
+		serialPort.setParameters(9600, UsbSerialDriver.DATABITS_8,
+				UsbSerialDriver.STOPBITS_1, UsbSerialDriver.PARITY_NONE);
 
 		// set reader and writer
-		writer = new KettlerBikeWriter(true, serialPort.getOutputStream());
-		RXTXReader rxtxReader = new RXTXReader(serialPort);
-		reader = new KettlerBikeReader(rxtxReader);
+		UsbSerialOutputStream usbWriter = new UsbSerialOutputStream(serialPort);
+		writer = new KettlerBikeWriter(true, usbWriter);
+		UsbSerialInputStream usbReader = new UsbSerialInputStream(serialPort);
+		reader = new KettlerBikeReader(usbReader);
 	}
 
 	@Override
@@ -93,27 +99,24 @@ public class KettlerBikeConnector implements BikeConnector {
 	@Override
 	public void close() throws IOException {
 		// stop reader and writer
-		if(reader != null) {
+		if (reader != null) {
 			reader.removeAllBikeReaderListeners();
 			reader.close();
 			reader = null;
 		}
-		if(writer != null) {
+		if (writer != null) {
 			writer = null;
 		}
 
 		// close streams and socket
-		if(serialPort != null) {
-			serialPort.getOutputStream().close();
-			serialPort.getInputStream().close();
-			serialPort.removeEventListener();
-			serialPort.close();
+		if (mDriver != null) {
+			mDriver.close();
 		}
 	}
 
 	@Override
 	public String getName() {
-		return "Kettler-RXTX";
+		return "Kettler-USBSerialDriver";
 	}
 
 	@Override

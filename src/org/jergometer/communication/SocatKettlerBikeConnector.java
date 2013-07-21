@@ -1,9 +1,7 @@
 package org.jergometer.communication;
 
-import gnu.io.UnsupportedCommOperationException;
 import org.jergometer.model.DataRecord;
 
-import javax.swing.*;
 import java.io.IOException;
 
 /**
@@ -19,7 +17,7 @@ public class SocatKettlerBikeConnector implements BikeConnector {
 	private int power = 0;
 
 	@Override
-	public void connect(String serialName, BikeListener listener) throws BikeException, UnsupportedCommOperationException, IOException {
+	public void connect(String serialName, BikeListener listener) throws BikeException, IOException {
 		process = Runtime.getRuntime().exec(new String[]{
 			"/usr/bin/socat", "-", serialName + ",b9600,min=1,time=1,brkint=0,icrnl=0,ixoff=1,imaxbel=0,opost=0,isig=0,icanon=0,iexten=0,echo=0,echoe=0,echok=0,crnl"
 		});

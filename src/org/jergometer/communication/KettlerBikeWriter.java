@@ -18,6 +18,7 @@ public class KettlerBikeWriter {
 	public static final String CMD_RESET      = "RS";
 	public static final String CMD_GET_STATUS = "ST ";
 	public static final String CMD_SET_POWER  = "PW ";
+	public static final String CMD_RECOVERY   = "RC";
 
 // dynamic
 
@@ -61,6 +62,15 @@ public class KettlerBikeWriter {
 			Thread.sleep(5000);
 		} catch (InterruptedException ignored) {}
 	}
+	
+	/**
+	 * Sends the startRecovery command to the bike.
+	 *
+	 * @throws IOException thrown if io problems occurred
+	 */	
+	public void sendStartRecovery() throws IOException {
+		writeRawBytes(CMD_RECOVERY.getBytes());
+	}
 
 	/**
 	 * Sends the getId command to the bike.
@@ -93,5 +103,5 @@ public class KettlerBikeWriter {
 		out.write(bytes);
 		out.write(ln);
 		out.flush();
-	}
+	}	
 }

@@ -1,8 +1,8 @@
 package org.jergometer.model;
 
-import de.endrullis.utils.VelocityUtils;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
+//import de.endrullis.utils.VelocityUtils;
+//import org.apache.velocity.Template;
+//import org.apache.velocity.VelocityContext;
 
 import java.io.*;
 import java.sql.Time;
@@ -176,11 +176,11 @@ public class BikeSession {
 		toStream(out);
 		out.close();
 
-		toHRM(filenameHRM);
+		//toHRM(filenameHRM);
 		needToBeSaved = false;
 	}
 
-	private void toHRM(String filename) {
+	/*private void toHRM(String filename) {
 		VelocityContext context = new VelocityContext();
 		try {
 			Template template = VelocityUtils.getTemplate("org/jergometer/model/templates/hrm.template");
@@ -219,7 +219,7 @@ public class BikeSession {
 		} catch (Exception e){
 			System.err.println("Error: " + e.getMessage());
 		}
-	}
+	}*/
 
 	private void toStream(DataOutputStream out) throws IOException {
 		out.writeUTF("jergometer session");

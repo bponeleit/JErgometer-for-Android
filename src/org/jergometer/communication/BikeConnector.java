@@ -1,6 +1,5 @@
 package org.jergometer.communication;
 
-import gnu.io.UnsupportedCommOperationException;
 
 import java.io.IOException;
 import java.io.Closeable;
@@ -16,7 +15,7 @@ public interface BikeConnector extends Closeable {
 	public void sendGetData() throws IOException;
 	public void sendSetPower(int power) throws IOException;
 
-	public void connect(String serialName, BikeListener listener) throws BikeException, UnsupportedCommOperationException, IOException;
+	public void connect(String serialName, BikeListener listener) throws BikeException, IOException;
 
 	/**
 	 * Closes the connection to the ergometer.

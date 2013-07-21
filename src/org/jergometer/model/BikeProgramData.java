@@ -1,8 +1,8 @@
 package org.jergometer.model;
 
-import de.endrullis.xml.XMLElement;
-
 import java.util.ArrayList;
+
+import de.endrullis.xml.XMLElement;
 
 /**
  * Bike program data used by BikeProgram.

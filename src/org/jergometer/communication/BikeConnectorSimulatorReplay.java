@@ -1,7 +1,5 @@
 package org.jergometer.communication;
 
-import de.endrullis.utils.StreamUtils;
-import gnu.io.UnsupportedCommOperationException;
 import org.jergometer.model.DataRecord;
 
 import java.io.*;
@@ -16,9 +14,10 @@ public class BikeConnectorSimulatorReplay implements BikeConnector {
 	private DataInputStream sessionInputStream;
 
 	@Override
-	public void connect(String serialName, BikeListener listener) throws BikeException, UnsupportedCommOperationException, IOException {
+	public void connect(String serialName, BikeListener listener) throws BikeException, IOException {
 		this.listener = listener;
-		sessionInputStream = new DataInputStream(StreamUtils.getInputStream(SIMULATOR_SESSION));
+		//sessionInputStream = new DataInputStream(StreamUtils.getInputStream(SIMULATOR_SESSION));
+		//TODO get InputStream
 	}
 
 	@Override
