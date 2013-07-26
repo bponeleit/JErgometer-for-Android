@@ -1,5 +1,8 @@
-package de.poneleit.JErgometer;
+package de.poneleit.jergometer.gui;
 
+import de.poneleit.jergometer.R;
+import de.poneleit.jergometer.R.layout;
+import de.poneleit.jergometer.R.menu;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
