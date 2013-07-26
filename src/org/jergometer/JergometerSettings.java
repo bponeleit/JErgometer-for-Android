@@ -7,7 +7,7 @@ import de.endrullis.xml.XMLElement;
 import de.endrullis.xml.XMLParser;
 import org.jergometer.communication.BikeConnectors;
 
-import javax.swing.*;
+//import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class JergometerSettings {
 
 	private BetterProperties2 properties = new BetterProperties2();
 	private boolean checkForUpdatesOnStart = true;
-	private Rectangle mainWindowBounds;
+//	private Rectangle mainWindowBounds;
 	private int mainWindowMaximizedState;
 	private ArrayList<String> userNames = new ArrayList<String>();
 	private String lastUserName;
@@ -100,7 +100,7 @@ public class JergometerSettings {
 		properties.addEntry(new BetterProperties2.Def("main_window.y", INT_GT_0, "0"));
 		properties.addEntry(new BetterProperties2.Def("main_window.width", INT_GT_0, "700"));
 		properties.addEntry(new BetterProperties2.Def("main_window.height", INT_GT_0, "500"));
-		properties.addEntry(new BetterProperties2.Def("main_window.maximized", INT_GT_0, "" + JFrame.MAXIMIZED_BOTH));
+//		properties.addEntry(new BetterProperties2.Def("main_window.maximized", INT_GT_0, "" + JFrame.MAXIMIZED_BOTH));
 		/*
 		properties.addEntry(new BetterProperties2.Comment(" Width of the symbols panel as part of the main window"));
 		properties.addEntry(new BetterProperties2.Def("symbols_panel.width", DOUBLE_0_TO_1, "0.25"));
@@ -132,12 +132,12 @@ public class JergometerSettings {
 
 		// extract variables
 		checkForUpdatesOnStart = properties.getBoolean("check_for_updates");
-		mainWindowBounds = new Rectangle(
-				properties.getInt("main_window.x"),
-				properties.getInt("main_window.y"),
-				properties.getInt("main_window.width"),
-				properties.getInt("main_window.height")
-		);
+//		mainWindowBounds = new Rectangle(
+//				properties.getInt("main_window.x"),
+//				properties.getInt("main_window.y"),
+//				properties.getInt("main_window.width"),
+//				properties.getInt("main_window.height")
+//		);
 		mainWindowMaximizedState = properties.getInt("main_window.maximized");
 
 		lastUserName = properties.getString("last_user");
@@ -174,10 +174,10 @@ public class JergometerSettings {
 
 	public void save() {
 		properties.setBoolean("check_for_updates", checkForUpdatesOnStart);
-		properties.setInt("main_window.x", mainWindowBounds.x);
-		properties.setInt("main_window.y", mainWindowBounds.y);
-		properties.setInt("main_window.width", mainWindowBounds.width);
-		properties.setInt("main_window.height", mainWindowBounds.height);
+//		properties.setInt("main_window.x", mainWindowBounds.x);
+//		properties.setInt("main_window.y", mainWindowBounds.y);
+//		properties.setInt("main_window.width", mainWindowBounds.width);
+//		properties.setInt("main_window.height", mainWindowBounds.height);
 		properties.setInt("main_window.maximized", mainWindowMaximizedState);
 
 		properties.setString("last_user", lastUserName);
@@ -217,13 +217,13 @@ public class JergometerSettings {
 		this.checkForUpdatesOnStart = checkForUpdatesOnStart;
 	}
 
-	public Rectangle getMainWindowBounds() {
-		return mainWindowBounds;
-	}
-
-	public void setMainWindowBounds(Rectangle mainWindowBounds) {
-		this.mainWindowBounds = mainWindowBounds;
-	}
+//	public Rectangle getMainWindowBounds() {
+//		return mainWindowBounds;
+//	}
+//
+//	public void setMainWindowBounds(Rectangle mainWindowBounds) {
+//		this.mainWindowBounds = mainWindowBounds;
+//	}
 
 	public int getMainWindowMaximizedState() {
 		return mainWindowMaximizedState;
