@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
+ * TODO remove javax.swing reference
  * BetterProperties2 is an improved implementation of {@link de.endrullis.utils.BetterProperties} and
  * {@link java.util.Properties}.
  *
