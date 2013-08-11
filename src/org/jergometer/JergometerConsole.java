@@ -2,6 +2,7 @@ package org.jergometer;
 
 import org.jergometer.model.DataRecord;
 
+import de.poneleit.jergometer.R;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,7 +39,7 @@ public class JergometerConsole extends Thread {
 						destPower += random.nextInt(3)-1;
 						energy    += random.nextInt(2);
 						realPower += random.nextInt(3)-1;
-						jergometer.bikeData(new DataRecord(pulse, pedalRpm, speed, distance, destPower, energy, "" + time, realPower));
+						//jergometer.bikeData(new DataRecord(pulse, pedalRpm, speed, distance, destPower, energy, "" + time, realPower));
 						sleep(10);
 					}
 					lastTime = time;
@@ -46,7 +47,7 @@ public class JergometerConsole extends Thread {
 //				if (line.equals("idle")) {
 					for (int idleTime = 0; idleTime < 20; idleTime++) {
 						pulse     += random.nextInt(2)-1;
-						jergometer.bikeData(new DataRecord(pulse, 0, 0, distance, destPower, energy, "" + time, realPower));
+						//jergometer.bikeData(new DataRecord(pulse, 0, 0, distance, destPower, energy, "" + time, realPower));
 						sleep(10);
 					}
 					for (; time < 150; time++) {
@@ -57,13 +58,13 @@ public class JergometerConsole extends Thread {
 						destPower += random.nextInt(3)-1;
 						energy    += random.nextInt(2);
 						realPower += random.nextInt(3)-1;
-						jergometer.bikeData(new DataRecord(pulse, pedalRpm, speed, distance, destPower, energy, "" + time, realPower));
+						//jergometer.bikeData(new DataRecord(pulse, pedalRpm, speed, distance, destPower, energy, "" + time, realPower));
 						sleep(10);
 					}
 					lastTime = time;
 					for (int idleTime = 0; idleTime < 20; idleTime++) {
 						pulse     += random.nextInt(2)-1;
-						jergometer.bikeData(new DataRecord(pulse, 0, 0, distance, destPower, energy, "" + time, realPower));
+						//jergometer.bikeData(new DataRecord(pulse, 0, 0, distance, destPower, energy, "" + time, realPower));
 						sleep(10);
 					}
 				} else

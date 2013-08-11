@@ -1,23 +1,24 @@
 package org.jergometer;
 
 import de.endrullis.utils.ParamsExt;
-import de.endrullis.utils.ProgramUpdater;
+//import de.endrullis.utils.ProgramUpdater;
 import de.endrullis.utils.ShellPrintStream;
 import de.endrullis.utils.StreamUtils;
+import de.poneleit.jergometer.R;
 import org.jergometer.communication.*;
 import org.jergometer.control.BikeProgram;
-import org.jergometer.diagram.*;
-import org.jergometer.gui.ChooseNewProgramDialog;
-import org.jergometer.gui.Diagram;
-import org.jergometer.gui.MainWindow;
+//import org.jergometer.diagram.*;
+//import org.jergometer.gui.ChooseNewProgramDialog;
+//import org.jergometer.gui.Diagram;
+//import org.jergometer.gui.MainWindow;
 import org.jergometer.model.*;
 import org.jergometer.translation.I18n;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
+//import javax.swing.*;
+//import javax.swing.tree.DefaultMutableTreeNode;
+//import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.*;
+//import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,11 +28,11 @@ import gnu.io.UnsupportedCommOperationException;
 /**
  * Main class of JErgometer.
  */
-public class Jergometer implements BikeListener, ActionListener, WindowListener {
+public class Jergometer {//implements BikeListener{//, ActionListener, WindowListener {
 
 // static
 
-	public static String version = "*Bleeding Edge*";
+	/*public static String version = "*Bleeding Edge*";
 	public static boolean devVersion = true;
 	public static boolean updatable = false;
 	static {
@@ -46,7 +47,7 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 	public enum State { notConnected, connected, reset, hello }
 	public enum SessionsVis { average, progression }
 
-	private final ProgramUpdater updater = new ProgramUpdater("JErgometer update", "http://common.jergometer.org/update/");
+//	private final ProgramUpdater updater = new ProgramUpdater("JErgometer update", "http://common.jergometer.org/update/");
 
 	public static void main(String[] args) {
 		ShellPrintStream.replaceSystemOut(args);
@@ -115,11 +116,11 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 	private ArrayList<BikeSession> selectedSessions = new ArrayList<BikeSession>();
 	private Diagram.Marker sessionEndMarker = null;
 
-	/**
+	*//**
 	 * Creates an JErgometer instance.
 	 *
 	 * @param gui true if you want to have a gui
-	 */
+	 *//*
 	public Jergometer(boolean gui) {
 		this.gui = gui;
 
@@ -134,7 +135,7 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 			}.start();
 		}
 
-		programTree = new BikeProgramTree();
+//		programTree = new BikeProgramTree();
 
 		mainWindow = new MainWindow(I18n.getString("main_window.title", version), this);
 		mainWindow.getProgramTree().setModel(programTree);
@@ -160,11 +161,11 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		});
 	}
 
-	/**
+	*//**
 	 * Checks for JErgometer updates.
 	 *
 	 * @param start true if you want to check for updates without notifications in case there are no new versions
-	 */
+	 *//*
 	private void checkForUpdates(boolean start) {
 		// check for new version
 		if (updater.isNewVersionAvailable()) {
@@ -185,14 +186,14 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		}
 	}
 
-	/**
+	*//**
 	 * Connects to the serial port.
 	 *
 	 * @throws gnu.io.UnsupportedCommOperationException if communication operation is not supported
 	 * @throws java.io.IOException if an I/O error occurs
 	 * @throws org.jergometer.communication.BikeException if the bike communication fails
 	 * @throws org.jergometer.communication.UnconfiguredSerialPortException if the serial port is not configured yet
-	 */
+	 *//*
 	private void connectToSerialPort() throws BikeException, UnsupportedCommOperationException, IOException, UnconfiguredSerialPortException {
 		String driver = jergometerSettings.getSerialDriver();
 		bikeConnector = BikeConnectors.name2bikeConnector.get(driver);
@@ -214,9 +215,9 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		}
 	}
 
-	/**
+	*//**
 	 * Saves all settings and sessions.
-	 */
+	 *//*
 	private void save() {
 		stopRecording();
 		jergometerSettings.setMainWindowBounds(mainWindow.getBounds());
@@ -226,11 +227,11 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 	}
 
 
-	/**
+	*//**
 	 * Adds a new user.
 	 *
 	 * @param userName user name
-	 */
+	 *//*
 	public void newUser(String userName) {
 		if (!jergometerSettings.getUserNames().contains(userName)) {
 			jergometerSettings.getUserNames().add(userName);
@@ -238,11 +239,11 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		}
 	}
 
-	/**
+	*//**
 	 * Sets the user to the given one.
 	 *
 	 * @param userName user name
-	 */
+	 *//*
 	public void switchToUser(String userName) {
 		jergometerSettings.setLastUserName(userName);
 		userSettings = new UserSettings(jergometerSettings.getLastUserName());
@@ -276,9 +277,9 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		mainWindow.getSessionTable().setModel(new SessionTableModel(filteredList));
 	}
 
-	/**
+	*//**
 	 * Forces a reparse of the sessions files of the current user.
-	 */
+	 *//*
 	public void reparseUserData() {
 		try {
 			ProgressMonitor pm = new ProgressMonitor(mainWindow, I18n.getString("msg.loading_user_sessions"), null, 0, 0);
@@ -350,9 +351,9 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		filterSessions();
 	}
 
-	/**
+	*//**
 	 * Starts the recording of a bike session.
-	 */
+	 *//*
 	public void startRecording() {
 		if (!recording) {
 			if (program == null) {
@@ -400,9 +401,9 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		}
 	}
 
-	/**
+	*//**
 	 * Stops the recording and saves the session to a file.
-	 */
+	 *//*
 	public void stopRecording() {
 		if (recording) {
 			if (communicationTimer != null) {
@@ -500,12 +501,12 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		filterSessions();
 	}
 
-	/**
+	*//**
 	 * Shows a bike session in the diagram.
 	 *
 	 * @param bikeSession bike session
 	 * @throws java.io.IOException if an I/O error occurs
-	 */
+	 *//*
 	private void visualizeBikeSession(BikeSession bikeSession) throws IOException {
 		diagramVisualizer.stopVisualization();
 
@@ -624,9 +625,9 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 		return programTree;
 	}
 
-	/**
+	*//**
 	 * Leaves the program.
-	 */
+	 *//*
 	public void quit() {
 		save();
 		//mainWindow.dispose();
@@ -657,14 +658,14 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 			diagram.redrawImage();
 		}
 
-		/*
+		
 		if (program.getSession().getDuration() < diagram.getTimeRange().max) {
 			int time = program.getSession().getDuration();
 			diagram.addValue("pulse", time, data.getPulse());
 			diagram.addValue("pedalRPM", time, data.getPedalRpm());
 			diagram.addValue("power", time, data.getRealPower());
 		}
-		*/
+		
 
 		// add new data record to session
 		switch (program.update(data)) {
@@ -719,7 +720,7 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 	}
 
 	@Override
-	/** Called if user has pressed plus or minus key on ergometer. */
+	*//** Called if user has pressed plus or minus key on ergometer. *//*
 	public void bikeDestPowerChanged(int change) {
 		System.out.println("change: " + change);
 		program.changeInteractively(change);
@@ -773,4 +774,4 @@ public class Jergometer implements BikeListener, ActionListener, WindowListener 
 
 	public void windowDeactivated(WindowEvent e) {
 	}
-}
+*/}

@@ -1,6 +1,7 @@
 package de.endrullis.utils;
 
-import javax.swing.*;
+//import javax.swing.*;
+import de.poneleit.jergometer.R;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -598,21 +599,21 @@ public class BetterProperties2 extends Properties {
 		}
 	}
 
-	public static class PShortcut implements Range {
-		@Override
-		public boolean isValid(String s) {
-			try {
-				return KeyStroke.getKeyStroke(s).getKeyCode() >= 0;
-			} catch (Exception e) {
-				return false;
-			}
-		}
-
-		@Override
-		public String description() {
-			return "Java shortcut";
-		}
-	}
+//	public static class PShortcut implements Range {
+//		@Override
+//		public boolean isValid(String s) {
+//			try {
+//				return KeyStroke.getKeyStroke(s).getKeyCode() >= 0;
+//			} catch (Exception e) {
+//				return false;
+//			}
+//		}
+//
+//		@Override
+//		public String description() {
+//			return "Java shortcut";
+//		}
+//	}
 
 	public static final Range INT           = new PInt();
 	public static final Range INT_GT_0      = new PInt(0);
@@ -621,5 +622,5 @@ public class BetterProperties2 extends Properties {
 	public static final Range DOUBLE_0_TO_1 = new PDouble(0, 1);
 	public static final Range BOOLEAN       = new PBoolean();
 	public static final Range STRING        = new PString();
-	public static final Range SHORTCUT      = new PShortcut();
+//	public static final Range SHORTCUT      = new PShortcut();
 }

@@ -1,11 +1,12 @@
 package org.jergometer.model;
 
+import de.endrullis.utils.StreamUtils;
+import de.endrullis.xml.XMLDocument;
+import de.endrullis.xml.XMLElement;
+import de.endrullis.xml.XMLParser;
+import de.poneleit.jergometer.R;
 import org.jergometer.JergometerSettings;
 import org.jergometer.control.BikeProgram;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlSerializer;
-
-import android.util.Xml;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,13 +19,14 @@ import java.util.Date;
 public class UserData {
 	private String userName;
 	private ArrayList<BikeSession> sessions = new ArrayList<BikeSession>();
-	//private ProgressMonitor progressMonitor;
+//	private ProgressMonitor progressMonitor;
 
-	public UserData(String userName, BikeProgramTree programTree) {
+	public UserData(String userName) {
 		this.userName = userName;
 
 		// load sessions
-		load(programTree);
+		//load(programTree);
+		load();
 	}
 
 	public void generate() throws IOException {
@@ -32,91 +34,78 @@ public class UserData {
 
 		File[] sessionFiles = getSessionFiles();
 		Arrays.sort(sessionFiles);
-		//		if (progressMonitor != null)
-		//			progressMonitor.setMaximum(sessionFiles.length);
+//		if (progressMonitor != null)
+//			progressMonitor.setMaximum(sessionFiles.length);
 
-		int nr = 0;
+//		int nr = 0;
 		for (File file : sessionFiles) {
 			sessions.add(new BikeSession(file));
-			nr++;
-			//			if (progressMonitor != null) {
-			//				progressMonitor.setProgress(nr);
-			//				if (progressMonitor.isCanceled()) {
-			//					break;
-			//				}
-			//			}
+//			nr++;
+//			if (progressMonitor != null) {
+//				progressMonitor.setProgress(nr);
+//				if (progressMonitor.isCanceled()) {
+//					break;
+//				}
+//			}
 		}
 	}
 
-	public void load(BikeProgramTree programTree) {
+	public void load() {
 		sessions.clear();
 
 		String sessionsDirName = JergometerSettings.jergometerUsersDirName + "/" + userName + "/sessions/";
 		File sessionsFile = new File(JergometerSettings.jergometerUsersDirName + "/" + userName + "/sessions.xml");
-		FileInputStream in = null;
 		if (sessionsFile.exists()) {
-			XmlPullParser parser = Xml.newPullParser();
+			XMLParser parser = new XMLParser();
 			try {
-				in = new FileInputStream(sessionsFile);
-				String ns = null;
-				parser.setInput(in, null);				
-				parser.nextTag();
-				parser.require(XmlPullParser.START_TAG, ns, "sessions");
+				XMLDocument doc = parser.parse(StreamUtils.readXmlStream(new FileInputStream(sessionsFile)));
+				XMLElement root = doc.getRootElement();
 
-				while (parser.next() != XmlPullParser.END_TAG) {
-					if (parser.getEventType() != XmlPullParser.START_TAG) {
-						continue;					
+				XMLElement sessionsXml = root.getChildElement("sessions");
+
+				for (XMLElement sessionXml : sessionsXml.getChildElements()) {
+					long time = Long.parseLong(sessionXml.getAttribute("date"));
+					String programName = sessionXml.getAttribute("programName");
+					String programdurationString = sessionXml.getAttribute("programduration");
+					int programduration;
+					if (programdurationString != null) {
+						programduration = Integer.parseInt(programdurationString);
+					} else {
+						programduration = -1;
 					}
-					
-					String name = parser.getName();
-					//for (XMLElement sessionXml : sessionsXml.getChildElements()) {
-					if (name.equals("session")) {
-						long time = Long.parseLong(parser.getAttributeValue("date", ns));
-						String programName = parser.getAttributeValue("programName", ns);
-						String programdurationString = parser.getAttributeValue("programduration", ns);
-						int programduration;
-						if (programdurationString != null) {
-							programduration = Integer.parseInt(programdurationString);
-						} else {
-							programduration = -1;
-						}
-						if (programduration == -1) {
-							// handle old session format 1 -> try to determine the program duration
-							BikeProgram program = programTree.getProgram(programName);
-							if (program != null) {
-								programduration = programTree.getProgram(programName).getProgramData().getDuration();
-							}
-						}
-
-						StatsRecord statsRegular, statsTotal;
-						XMLElement statsRegularXml = sessionXml.getChildElement("statsRegular");
-						if (statsRegularXml != null) {
-							statsRegular = new StatsRecord(statsRegularXml);
-						} else {
-							int duration = Integer.parseInt(parser.getAttributeValue("duration", ns));
-							int sumPulse = Integer.parseInt(parser.getAttributeValue("sumPulse", ns));
-							int sumPower = Integer.parseInt(parser.getAttributeValue("sumPower", ns));
-							int sumPedalRpm = Integer.parseInt(parser.getAttributeValue("sumPedalRpm", ns));
-							int pulseCount = Integer.parseInt(parser.getAttributeValue("pulseCount", ns));
-							statsRegular = new StatsRecord(sumPulse, sumPower, sumPedalRpm, duration, pulseCount);
-						}
-
-						XMLElement statsTotalXml = sessionXml.getChildElement("statsTotal");
-						if (statsTotalXml != null) {
-							statsTotal = new StatsRecord(statsTotalXml);
-						} else {
-							statsTotal = statsRegular;
-						}
-
-						sessions.add(new BikeSession(sessionsDirName, new Date(time), programName, programduration,
-								statsRegular, statsTotal));
+					if (programduration == -1) {
+						// handle old session format 1 -> try to determine the program duration
+//						BikeProgram program = programTree.getProgram(programName);
+//						if (program != null) {
+//							programduration = programTree.getProgram(programName).getProgramData().getDuration();
+//						}
 					}
+
+					StatsRecord statsRegular, statsTotal;
+					XMLElement statsRegularXml = sessionXml.getChildElement("statsRegular");
+					if (statsRegularXml != null) {
+						statsRegular = new StatsRecord(statsRegularXml);
+					} else {
+						int duration = Integer.parseInt(sessionXml.getAttribute("duration"));
+						int sumPulse = Integer.parseInt(sessionXml.getAttribute("sumPulse"));
+						int sumPower = Integer.parseInt(sessionXml.getAttribute("sumPower"));
+						int sumPedalRpm = Integer.parseInt(sessionXml.getAttribute("sumPedalRpm"));
+						int pulseCount = Integer.parseInt(sessionXml.getAttribute("pulseCount"));
+						statsRegular = new StatsRecord(sumPulse, sumPower, sumPedalRpm, duration, pulseCount);
+					}
+
+					XMLElement statsTotalXml = sessionXml.getChildElement("statsTotal");
+					if (statsTotalXml != null) {
+						statsTotal = new StatsRecord(statsTotalXml);
+					} else {
+						statsTotal = statsRegular;
+					}
+
+					sessions.add(new BikeSession(sessionsDirName, new Date(time), programName, programduration,
+							statsRegular, statsTotal));
 				}
 
 			} catch (Exception ignored) {
-			} finally {
-				if (in != null)
-					in.close();
 			}
 		} else {
 			try {
@@ -144,8 +133,6 @@ public class UserData {
 	}
 
 	public void save() {
-		XmlSerializer serializer = Xml.newSerializer();
-		StringWriter doc = new StringWriter();
 		XMLElement root = new XMLElement("sessions");
 		root.setAttribute("version", "3");
 
@@ -167,7 +154,7 @@ public class UserData {
 			if (lastProgram != null) {
 				programs.setAttribute("lastProgram", lastProgram);
 			}
-			 */
+			*/
 		}
 
 		// write the document
@@ -192,11 +179,11 @@ public class UserData {
 		return sessions;
 	}
 
-	public ProgressMonitor getProgressMonitor() {
-		return progressMonitor;
-	}
-
-	public void setProgressMonitor(ProgressMonitor progressMonitor) {
-		this.progressMonitor = progressMonitor;
-	}
+//	public ProgressMonitor getProgressMonitor() {
+//		return progressMonitor;
+//	}
+//
+//	public void setProgressMonitor(ProgressMonitor progressMonitor) {
+//		this.progressMonitor = progressMonitor;
+//	}
 }
