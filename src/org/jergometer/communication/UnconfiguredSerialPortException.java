@@ -1,5 +1,7 @@
 package org.jergometer.communication;
 
+import de.poneleit.jergometer.R;
+
 /**
  * Unconfigured serial port exception.
  */

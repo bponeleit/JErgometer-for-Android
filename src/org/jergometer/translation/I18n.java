@@ -1,6 +1,7 @@
 package org.jergometer.translation;
 
 import de.endrullis.utils.Utf8ResourceBundle;
+import de.poneleit.jergometer.R;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.PropertyKey;
 

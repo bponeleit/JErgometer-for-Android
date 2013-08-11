@@ -1,5 +1,6 @@
 package de.endrullis.utils;
 
+import de.poneleit.jergometer.R;
 import java.util.*;
 import java.io.*;
 

@@ -2,6 +2,7 @@ package de.endrullis.utils;
 
 import org.jetbrains.annotations.NonNls;
 
+import de.poneleit.jergometer.R;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;

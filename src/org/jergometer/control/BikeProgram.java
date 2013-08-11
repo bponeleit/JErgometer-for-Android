@@ -2,6 +2,7 @@ package org.jergometer.control;
 
 import org.jergometer.model.*;
 
+import de.poneleit.jergometer.R;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.io.File;

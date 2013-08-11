@@ -4,6 +4,7 @@ package org.jergometer.model;
 //import org.apache.velocity.Template;
 //import org.apache.velocity.VelocityContext;
 
+import de.poneleit.jergometer.R;
 import java.io.*;
 import java.sql.Time;
 import java.text.DateFormat;

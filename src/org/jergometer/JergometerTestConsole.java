@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import de.poneleit.jergometer.R;
 import gnu.io.UnsupportedCommOperationException;
 
 /**

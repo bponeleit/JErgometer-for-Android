@@ -4,6 +4,7 @@ import de.endrullis.utils.StreamUtils;
 import de.endrullis.xml.XMLDocument;
 import de.endrullis.xml.XMLElement;
 import de.endrullis.xml.XMLParser;
+import de.poneleit.jergometer.R;
 
 import java.io.File;
 import java.io.FileInputStream;

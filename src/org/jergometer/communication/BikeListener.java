@@ -1,5 +1,6 @@
 package org.jergometer.communication;
 
+import de.poneleit.jergometer.R;
 import org.jergometer.model.DataRecord;
 
 /**

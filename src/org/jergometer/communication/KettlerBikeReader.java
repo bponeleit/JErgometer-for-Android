@@ -2,6 +2,7 @@ package org.jergometer.communication;
 
 import org.jergometer.model.DataRecord;
 
+import de.poneleit.jergometer.R;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,5 +1,6 @@
 package de.endrullis.utils;
 
+import de.poneleit.jergometer.R;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;

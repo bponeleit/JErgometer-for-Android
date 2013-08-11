@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import de.poneleit.jergometer.R;
 
 public class UsbSerialOutputStream extends OutputStream {
 	

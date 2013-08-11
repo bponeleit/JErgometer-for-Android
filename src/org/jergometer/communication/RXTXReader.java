@@ -1,5 +1,6 @@
 package org.jergometer.communication;
 
+import de.poneleit.jergometer.R;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;

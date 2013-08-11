@@ -1,5 +1,7 @@
 package org.jergometer.model;
 
+import de.poneleit.jergometer.R;
+
 /**
  * Status of the session update.
  *

@@ -14,6 +14,7 @@ import android.hardware.usb.UsbManager;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
+import de.poneleit.jergometer.R;
 
 /**
  * KettlerBikeConnector connects to the bike via serial port (e.g. RS232 or

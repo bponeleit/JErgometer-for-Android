@@ -5,6 +5,7 @@ import de.endrullis.utils.StreamUtils;
 import de.endrullis.xml.XMLDocument;
 import de.endrullis.xml.XMLElement;
 import de.endrullis.xml.XMLParser;
+import de.poneleit.jergometer.R;
 import org.jergometer.communication.BikeConnectors;
 
 //import javax.swing.*;
@@ -37,7 +38,7 @@ public class JergometerSettings {
 	public static final BetterProperties2.Range DOUBLE_0_TO_1 = BetterProperties2.DOUBLE_0_TO_1;
 	public static final BetterProperties2.Range BOOLEAN       = BetterProperties2.BOOLEAN;
 	public static final BetterProperties2.Range STRING        = BetterProperties2.STRING;
-	public static final BetterProperties2.Range SHORTCUT      = BetterProperties2.SHORTCUT;
+//	public static final BetterProperties2.Range SHORTCUT      = BetterProperties2.SHORTCUT;
 
 
 // dynamic
@@ -110,11 +111,11 @@ public class JergometerSettings {
 
 		properties.addEntry(new BetterProperties2.Comment("\n## Shortcuts"));
 		properties.addEntry(new BetterProperties2.Comment(" File menu"));
-		properties.addEntry(new BetterProperties2.Def("shortcut.new", SHORTCUT, "control N"));
-		properties.addEntry(new BetterProperties2.Def("shortcut.open", SHORTCUT, "control O"));
-		properties.addEntry(new BetterProperties2.Def("shortcut.save", SHORTCUT, "control S"));
-		properties.addEntry(new BetterProperties2.Def("shortcut.close", SHORTCUT, "control W"));
-		properties.addEntry(new BetterProperties2.Def("shortcut.exit", SHORTCUT, ""));
+//		properties.addEntry(new BetterProperties2.Def("shortcut.new", SHORTCUT, "control N"));
+//		properties.addEntry(new BetterProperties2.Def("shortcut.open", SHORTCUT, "control O"));
+//		properties.addEntry(new BetterProperties2.Def("shortcut.save", SHORTCUT, "control S"));
+//		properties.addEntry(new BetterProperties2.Def("shortcut.close", SHORTCUT, "control W"));
+//		properties.addEntry(new BetterProperties2.Def("shortcut.exit", SHORTCUT, ""));
 
 	}
 

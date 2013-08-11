@@ -5,6 +5,7 @@ package de.endrullis.utils;
  * I found this code on this website, posted by a user named "thoughts":
  * http://www.thoughtsabout.net/blog/archives/000044.html
  */
+import de.poneleit.jergometer.R;
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Locale;

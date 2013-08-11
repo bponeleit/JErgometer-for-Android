@@ -4,6 +4,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.exception.ResourceNotFoundException;
 
+import de.poneleit.jergometer.R;
 import java.io.InputStream;
 import java.util.Properties;
 

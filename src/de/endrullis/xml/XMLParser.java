@@ -7,6 +7,7 @@
 
 package de.endrullis.xml;
 
+import de.poneleit.jergometer.R;
 import java.util.ArrayList;
 
 public class XMLParser{

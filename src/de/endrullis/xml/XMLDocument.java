@@ -7,6 +7,8 @@
 
 package de.endrullis.xml;
 
+import de.poneleit.jergometer.R;
+
 public class XMLDocument{
   /** Default values for version and encoding. */
   private String xmlVersion = "1.0";

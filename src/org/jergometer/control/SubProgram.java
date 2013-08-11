@@ -5,6 +5,7 @@ import org.jergometer.model.DataRecord;
 import org.jergometer.model.MiniDataRecord;
 import org.jergometer.translation.I18n;
 
+import de.poneleit.jergometer.R;
 import java.util.ArrayList;
 import java.io.IOException;
 

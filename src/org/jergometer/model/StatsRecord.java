@@ -1,6 +1,7 @@
 package org.jergometer.model;
 
 import de.endrullis.xml.XMLElement;
+import de.poneleit.jergometer.R;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

@@ -1,6 +1,7 @@
 package org.jergometer.communication;
 
 
+import de.poneleit.jergometer.R;
 import java.io.IOException;
 
 /**

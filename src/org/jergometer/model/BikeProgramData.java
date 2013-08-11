@@ -3,6 +3,7 @@ package org.jergometer.model;
 import java.util.ArrayList;
 
 import de.endrullis.xml.XMLElement;
+import de.poneleit.jergometer.R;
 
 /**
  * Bike program data used by BikeProgram.
