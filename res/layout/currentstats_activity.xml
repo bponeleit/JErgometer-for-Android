@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/powerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/power"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/heartrateView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/powerView"
+        android:layout_below="@+id/powerView"
+        android:layout_marginTop="16dp"
+        android:text="@string/heartrate"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ProgressBar
+        android:id="@+id/powerBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/powerView"
+        android:layout_alignLeft="@+id/heartrateBar"
+        android:layout_toRightOf="@+id/powerView" />
+
+    <ProgressBar
+        android:id="@+id/heartrateBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@+id/heartrateView"
+        android:layout_alignBottom="@+id/heartrateView" />
+
+    <TextView
+        android:id="@+id/rpm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/rpmView"
+        android:layout_alignBottom="@+id/rpmView"
+        android:layout_alignLeft="@+id/heartrateBar"
+        android:text="0"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/timeView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/rpmView"
+        android:layout_below="@+id/rpmView"
+        android:layout_marginTop="16dp"
+        android:text="@string/time"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/rpmView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/heartrateView"
+        android:layout_below="@+id/heartrateView"
+        android:layout_marginTop="16dp"
+        android:text="@string/RPM"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Chronometer
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/rpm"
+        android:layout_below="@+id/rpmView"
+        android:layout_marginTop="16dp"
+        android:text="@string/time" />
+
+        <TextView
+        android:id="@+id/tripView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/timeView"
+        android:layout_below="@+id/timeView"
+        android:layout_marginTop="16dp"
+        android:text="@string/trip"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+          <TextView
+        android:id="@+id/trip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/time"
+        android:layout_below="@+id/time"
+        android:layout_marginTop="16dp"
+        android:text="0"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+          <ImageButton
+              android:id="@+id/startButton"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignLeft="@+id/tripView"
+              android:layout_below="@+id/tripView"
+              android:layout_marginTop="16dp"
+              android:contentDescription="@string/start_button"
+              android:src="@android:drawable/ic_media_play" />
+
+          <ImageButton
+              android:id="@+id/stopButton"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_alignLeft="@+id/tripView"
+              android:layout_below="@+id/tripView"
+              android:layout_marginTop="16dp"
+              android:visibility="gone"
+              android:src="@android:drawable/ic_media_pause" 
+              android:contentDescription="@string/stop_button" />
+  
+</RelativeLayout>
