@@ -61,23 +61,23 @@ public class JergometerSettings {
 		programsDir.mkdirs();
 
 		// determine user list
-		File[] userDirs = new File(jergometerUsersDirName).listFiles();
-		for (File userDir : userDirs) {
-			if (userDir.isDirectory() && !userDir.isHidden()) {
-				userNames.add(userDir.getName());
-			}
-		}
-
-		// if no programs in programDir -> copy example programs into programsDir
-		if (programsDir.list().length == 0) {
-			File exampleProgramsDir = new File(jergometerExampleProgramsDirName);
-
-			try {
-				StreamUtils.copyFileRecursivlyLinewise(exampleProgramsDir, programsDir);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+//		File[] userDirs = new File(jergometerUsersDirName).listFiles();
+//		for (File userDir : userDirs) {
+//			if (userDir.isDirectory() && !userDir.isHidden()) {
+//				userNames.add(userDir.getName());
+//			}
+//		}
+//
+//		// if no programs in programDir -> copy example programs into programsDir
+//		if (programsDir.list().length == 0) {
+//			File exampleProgramsDir = new File(jergometerExampleProgramsDirName);
+//
+//			try {
+//				StreamUtils.copyFileRecursivlyLinewise(exampleProgramsDir, programsDir);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 		defineProperties();
 
@@ -139,7 +139,7 @@ public class JergometerSettings {
 //				properties.getInt("main_window.width"),
 //				properties.getInt("main_window.height")
 //		);
-		mainWindowMaximizedState = properties.getInt("main_window.maximized");
+//		mainWindowMaximizedState = properties.getInt("main_window.maximized");
 
 		lastUserName = properties.getString("last_user");
 		serialPort = properties.getString("comport");

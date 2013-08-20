@@ -90,7 +90,7 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 			System.exit(0);
 		}
 
-		new Jergometer(true);
+//		new Jergometer(true);
 	}
 
 	private static String bold(String text) {
@@ -748,8 +748,8 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	}
 
 	// ActionListener by communicationTimer
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == communicationTimer) {
+	public void actionPerformed() {
+//		if (e.getSource() == communicationTimer) {
 			try {
 				// FSM
 				switch(state) {
@@ -770,7 +770,7 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-		}
+//		}
 	}
 
 // WindowListener by mainWindow
