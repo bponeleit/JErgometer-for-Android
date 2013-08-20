@@ -1,11 +1,11 @@
 package de.poneleit.jergometer.gui;
 
 import de.poneleit.jergometer.R;
-import de.poneleit.jergometer.R.layout;
-import de.poneleit.jergometer.R.menu;
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.view.Menu;
+import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
@@ -22,5 +22,24 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		 // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.startProgram:
+	            startProgram();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+    
+	}
+
+
+	private void startProgram() {
+		startActivity(new Intent(this, CurrentStatsActivity.class));
+	}
     
 }
