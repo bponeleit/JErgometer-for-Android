@@ -1,0 +1,15 @@
+<program name="Burkart2" duration="1050">
+	<timeEvents>
+		<timeEvent time="0"><action type="power" value="100"/></timeEvent>			
+		<timeEvent time="+240"><action type="power" value="150"/></timeEvent>
+		<timeEvent time="+120"><action type="power" value="250"/></timeEvent>		
+		<timeEvent time="+30"><action type="power" value="75"/></timeEvent>
+		<timeEvent time="+45"><action type="power" value="250"/></timeEvent>
+		<timeEvent time="+30"><action type="power" value="75"/></timeEvent>
+		<timeEvent time="+45"><action type="power" value="250"/></timeEvent>
+		<timeEvent time="+30"><action type="power" value="75"/></timeEvent>		
+		<timeEvent time="+60"><action type="power" value="250"/></timeEvent>
+		<timeEvent time="+30"><action type="power" value="150"/></timeEvent>		
+		<timeEvent time="+240"><action type="power" value="100"/></timeEvent>
+	</timeEvents>
+</program>
