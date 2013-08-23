@@ -28,6 +28,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+//import java.util.Timer;
 
 import gnu.io.UnsupportedCommOperationException;
 
@@ -111,7 +114,7 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	private BikeConnector bikeConnector;
 //	private MainWindow mainWindow;
 	private boolean gui;
-//	private Timer communicationTimer = null;
+	private Timer communicationTimer = null;
 	private boolean recording = false;
 	private int power;
 	private Context context;
@@ -404,7 +407,13 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 
 			program.newSession();
 
-//			communicationTimer = new Timer(500, this);
+			communicationTimer = new Timer();
+			TimerTask task = new TimerTask() {
+					public void run() {
+						actionPerformed();
+				}
+			};
+			communicationTimer.scheduleAtFixedRate(task, 500, 500);
 //			communicationTimer.start();
 		}
 	}
@@ -414,9 +423,9 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	 */
 	public void stopRecording() {
 		if (recording) {
-//			if (communicationTimer != null) {
-//				communicationTimer.stop();
-//			}
+			if (communicationTimer != null) {
+				communicationTimer.cancel();
+			}
 			try {
 				if (bikeConnector != null) {
 					bikeConnector.close();
