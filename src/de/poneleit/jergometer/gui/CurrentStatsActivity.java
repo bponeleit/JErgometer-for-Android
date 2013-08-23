@@ -43,6 +43,8 @@ public class CurrentStatsActivity extends Activity implements OnClickListener {
 	private UsbSerialDriver mDriver;
 	private SerialInputOutputManager mSerialIoManager;
 	private Jergometer mJergometer;
+	private Button mStartButton;
+	private Button mStopButton;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -51,10 +53,10 @@ public class CurrentStatsActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.currentstats_activity);
 		mJergometer = new Jergometer(true, this);
 		// mDumpTextView = (TextView) findViewById(R.id.textView2);
-		Button button = (Button) findViewById(R.id.startButton);
-		button.setOnClickListener(this);
-		button = (Button) findViewById(R.id.stopButton);
-		button.setOnClickListener(this);
+		mStartButton = (Button) findViewById(R.id.startButton);
+		mStartButton.setOnClickListener(this);
+		mStopButton = (Button) findViewById(R.id.stopButton);
+		mStopButton.setOnClickListener(this);
 
 		// // Get UsbManager from Android.
 		// UsbManager manager = (UsbManager)
@@ -86,8 +88,13 @@ public class CurrentStatsActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View arg0) {
 		if (arg0.getId() == R.id.startButton) {
+			mStartButton.setVisibility(View.INVISIBLE);
+			mStopButton.setVisibility(View.VISIBLE);
 			mJergometer.startRecording();
+			
 		} else { 
+			mStartButton.setVisibility(View.VISIBLE);
+			mStopButton.setVisibility(View.INVISIBLE);
 			mJergometer.stopRecording();
 			
 		}

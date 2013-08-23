@@ -16,7 +16,10 @@ import org.jergometer.control.BikeProgram;
 import org.jergometer.model.*;
 import org.jergometer.translation.I18n;
 
+import android.app.Activity;
 import android.content.Context;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 //import javax.swing.*;
 //import javax.swing.tree.DefaultMutableTreeNode;
@@ -710,8 +713,14 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 //				}
 
 				int time = program.getSession().getDuration();
+				ProgressBar hrBar = (ProgressBar)((Activity)context).findViewById(R.id.heartrateBar);
+				hrBar.setProgress(data.getPulse());
 //				diagram.addValue("pulse", time, data.getPulse());
+				TextView rpm = (TextView)((Activity)context).findViewById(R.id.rpm);
+				rpm.setText(data.getPedalRpm());
 //				diagram.addValue("pedalRPM", time, data.getPedalRpm());
+				ProgressBar powerBar = (ProgressBar)((Activity)context).findViewById(R.id.powerBar);
+				powerBar.setProgress(data.getRealPower());
 //				diagram.addValue("power", time, data.getRealPower());
 
 				power = program.getPower();
