@@ -23,7 +23,7 @@ public class SocatKettlerBikeConnector implements BikeConnector {
 			"/usr/bin/socat", "-", serialName + ",b9600,min=1,time=1,brkint=0,icrnl=0,ixoff=1,imaxbel=0,opost=0,isig=0,icanon=0,iexten=0,echo=0,echoe=0,echok=0,crnl"
 		});
 		writer = new KettlerBikeWriter(false, process.getOutputStream());
-		reader = new KettlerBikeReader(process.getInputStream());
+//		reader = new KettlerBikeReader(process.getInputStream());
 		reader.addBikeReaderListener(listener);
 		reader.start();
 	}
