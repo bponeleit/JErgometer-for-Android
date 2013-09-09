@@ -35,6 +35,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.EditText;
 
@@ -43,8 +44,8 @@ public class CurrentStatsActivity extends Activity implements OnClickListener {
 	private UsbSerialDriver mDriver;
 	private SerialInputOutputManager mSerialIoManager;
 	private Jergometer mJergometer;
-	private Button mStartButton;
-	private Button mStopButton;
+	private ImageButton mStartButton;
+	private ImageButton mStopButton;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -53,9 +54,9 @@ public class CurrentStatsActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.currentstats_activity);
 		mJergometer = new Jergometer(true, this);
 		// mDumpTextView = (TextView) findViewById(R.id.textView2);
-		mStartButton = (Button) findViewById(R.id.startButton);
+		mStartButton = (ImageButton) findViewById(R.id.startButton);
 		mStartButton.setOnClickListener(this);
-		mStopButton = (Button) findViewById(R.id.stopButton);
+		mStopButton = (ImageButton) findViewById(R.id.stopButton);
 		mStopButton.setOnClickListener(this);
 
 		// // Get UsbManager from Android.
