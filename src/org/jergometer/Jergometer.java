@@ -47,14 +47,14 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	public static String version = "*Bleeding Edge*";
 	public static boolean devVersion = true;
 	public static boolean updatable = false;
-	static {
-		try {
-			version = StreamUtils.readFile("version.txt");
-			devVersion = false;
-			updatable = true;
-			updatable = Boolean.parseBoolean(StreamUtils.readFile("updatable"));
-		} catch (IOException ignored) {}
-	}
+//	static {
+//		try {
+//			version = StreamUtils.readFile("version.txt");
+//			devVersion = false;
+//			updatable = true;
+//			updatable = Boolean.parseBoolean(StreamUtils.readFile("updatable"));
+//		} catch (IOException ignored) {}
+//	}
 
 	public enum State { notConnected, connected, reset, hello }
 	public enum SessionsVis { average, progression }
