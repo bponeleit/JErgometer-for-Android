@@ -1,16 +1,19 @@
 package org.jergometer.communication;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
+
+
+import android.util.Log;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import de.poneleit.jergometer.R;
 
 public class UsbSerialOutputStream extends OutputStream {
+	private static final String TAG = UsbSerialOutputStream.class.getSimpleName();
 	
 	private UsbSerialDriver driver; 
-	private byte[] buffer;
+	private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
 	public UsbSerialOutputStream(UsbSerialDriver driver) {
 		this.driver = driver;
@@ -18,29 +21,33 @@ public class UsbSerialOutputStream extends OutputStream {
 
 	@Override
 	public void close() throws IOException {
+		Log.d(TAG, "close");
 		driver.close();
 	}
 
 	@Override
 	public void flush() throws IOException {
-		driver.write(buffer, 1000);
+		Log.d(TAG, "flush");
+		driver.write(buffer.toByteArray(), 1000);
+		buffer.reset();
 	}
 
 	@Override
 	public void write(byte[] buffer, int offset, int count) throws IOException {
-		System.arraycopy(buffer, offset, this.buffer, this.buffer.length, count);
+		Log.d(TAG, "write " + offset + " " + count);
+		this.buffer.write(buffer, offset, count);
 	}
 
 	@Override
 	public void write(byte[] buffer) throws IOException {
-		System.arraycopy(buffer, 0, this.buffer, this.buffer.length, buffer.length);
+		Log.d(TAG, "write ");
+		this.buffer.write(buffer);
 	}
 
 	@Override
 	public void write(int arg0) throws IOException {
-		byte[] buffer = new byte[1];
-		buffer[0] = (byte)arg0;
-		System.arraycopy(buffer, 0, this.buffer, this.buffer.length, buffer.length);
+		Log.d(TAG, "write " + arg0);
+		this.buffer.write(arg0);
 	}
 
 }
