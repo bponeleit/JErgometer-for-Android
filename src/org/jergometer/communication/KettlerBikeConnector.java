@@ -79,7 +79,7 @@ public class KettlerBikeConnector implements BikeConnector {
 		UsbSerialOutputStream usbWriter = new UsbSerialOutputStream(serialPort);
 		writer = new KettlerBikeWriter(true, usbWriter);
 //		UsbSerialInputStream usbReader = new UsbSerialInputStream(serialPort);
-		reader = new KettlerBikeReader(serialPort);
+		reader = new KettlerBikeReader(serialPort, context);
 	}
 
 	@Override
@@ -87,6 +87,7 @@ public class KettlerBikeConnector implements BikeConnector {
 //		if (!reader.isAlive()) {
 //			reader.start();
 //		}
+		if (writer != null)
 		writer.sendHello();
 	}
 
@@ -95,7 +96,8 @@ public class KettlerBikeConnector implements BikeConnector {
 //		if (!reader.isAlive()) {
 //			reader.start();
 //		}
-		writer.sendReset();
+		if (writer != null)
+			writer.sendReset();
 	}
 
 	@Override
@@ -105,6 +107,8 @@ public class KettlerBikeConnector implements BikeConnector {
 
 	@Override
 	public void sendGetData() throws IOException {
+		if (writer == null)
+			return;
 		if (power != 0) {
 			writer.sendSetPower(power);
 			power = 0;
