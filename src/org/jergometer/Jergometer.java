@@ -18,15 +18,15 @@ import org.jergometer.translation.I18n;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 //import javax.swing.*;
 //import javax.swing.tree.DefaultMutableTreeNode;
 //import javax.swing.tree.TreePath;
-import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
 //import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,47 +40,60 @@ import gnu.io.UnsupportedCommOperationException;
 /**
  * Main class of JErgometer.
  */
-public class Jergometer implements BikeListener{//, ActionListener, WindowListener {
+public class Jergometer implements BikeListener {// , ActionListener,
+													// WindowListener {
 
-// static
-
+	// static
+	private static final String TAG = Jergometer.class.getSimpleName();
 	public static String version = "*Bleeding Edge*";
 	public static boolean devVersion = true;
 	public static boolean updatable = false;
-//	static {
-//		try {
-//			version = StreamUtils.readFile("version.txt");
-//			devVersion = false;
-//			updatable = true;
-//			updatable = Boolean.parseBoolean(StreamUtils.readFile("updatable"));
-//		} catch (IOException ignored) {}
-//	}
+    private static long shortDelay = 800;
+    private static long longDelay = 5000;
+	// static {
+	// try {
+	// version = StreamUtils.readFile("version.txt");
+	// devVersion = false;
+	// updatable = true;
+	// updatable = Boolean.parseBoolean(StreamUtils.readFile("updatable"));
+	// } catch (IOException ignored) {}
+	// }
 
-	public enum State { notConnected, connected, reset, hello }
-	public enum SessionsVis { average, progression }
+	public enum State {
+		notConnected, connected, reset, hello
+	}
 
-//	private final ProgramUpdater updater = new ProgramUpdater("JErgometer update", "http://common.jergometer.org/update/");
+	public enum SessionsVis {
+		average, progression
+	}
+
+	// private final ProgramUpdater updater = new
+	// ProgramUpdater("JErgometer update",
+	// "http://common.jergometer.org/update/");
 
 	public static void main(String[] args) {
 		ShellPrintStream.replaceSystemOut(args);
 
-		ParamsExt.Option[] options = new ParamsExt.Option[]{
-				new ParamsExt.Option("help",     'h', I18n.getString("args.show_help")),
-				new ParamsExt.Option("nogui",    'G', I18n.getString("args.disable_gui")),
-				new ParamsExt.Option("bleeding-edge", null, I18n.getString("args.bleeding_edge")),
-				new ParamsExt.Option("color",    'c', I18n.getString("args.color", bold("on"), bold("off"))),
-				new ParamsExt.Option("version",  'v', I18n.getString("args.show_version"))
-		};
+		ParamsExt.Option[] options = new ParamsExt.Option[] {
+				new ParamsExt.Option("help", 'h',
+						I18n.getString("args.show_help")),
+				new ParamsExt.Option("nogui", 'G',
+						I18n.getString("args.disable_gui")),
+				new ParamsExt.Option("bleeding-edge", null,
+						I18n.getString("args.bleeding_edge")),
+				new ParamsExt.Option("color", 'c', I18n.getString("args.color",
+						bold("on"), bold("off"))),
+				new ParamsExt.Option("version", 'v',
+						I18n.getString("args.show_version")) };
 
 		// parse parameters
 		ParamsExt params = new ParamsExt(options, args);
-		params.setSyntax(bold("java test.endrullis.jergometer.Jergometer") + " [" +
-				underline(I18n.getString("args.options")) + "]"
-		);
+		params.setSyntax(bold("java test.endrullis.jergometer.Jergometer")
+				+ " [" + underline(I18n.getString("args.options")) + "]");
 
 		// begin of the real program
 
-		if(params.isOptionAvailable("help")) {
+		if (params.isOptionAvailable("help")) {
 			params.printHelp();
 			System.exit(0);
 		}
@@ -91,12 +104,12 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 			updatable = false;
 		}
 
-		if(params.isOptionAvailable("version")) {
+		if (params.isOptionAvailable("version")) {
 			System.out.println("JErgometer " + version);
 			System.exit(0);
 		}
 
-//		new Jergometer(true);
+		// new Jergometer(true);
 	}
 
 	private static String bold(String text) {
@@ -104,35 +117,38 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	}
 
 	private static String underline(String text) {
-		return ShellPrintStream.out.style(text, ShellPrintStream.STYLE_UNDERLINE);
+		return ShellPrintStream.out.style(text,
+				ShellPrintStream.STYLE_UNDERLINE);
 	}
 
-
-// dynamic
+	// dynamic
 
 	private JergometerSettings jergometerSettings;
 	private UserSettings userSettings = null;
 	private UserData userData = null;
 	private State state = State.notConnected;
 	private BikeConnector bikeConnector;
-//	private MainWindow mainWindow;
+	// private MainWindow mainWindow;
 	private boolean gui;
 	private Timer communicationTimer = null;
 	private boolean recording = false;
 	private int power;
 	private Context context;
-//	private BikeProgramTree programTree;
+	// private BikeProgramTree programTree;
 	private BikeProgram program;
-//	private DiagramVisualizer diagramVisualizer = new BikeProgramVisualizer(null);
+	// private DiagramVisualizer diagramVisualizer = new
+	// BikeProgramVisualizer(null);
 	private BikeSessionFilter sessionFilter = new BikeSessionFilter();
 	private SessionsVis sessionsVis = SessionsVis.average;
 	private ArrayList<BikeSession> selectedSessions = new ArrayList<BikeSession>();
-//	private Diagram.Marker sessionEndMarker = null;
+	// private Diagram.Marker sessionEndMarker = null;
+	private Handler handler = new Handler();
 
 	/**
 	 * Creates an JErgometer instance.
-	 *
-	 * @param gui true if you want to have a gui
+	 * 
+	 * @param gui
+	 *            true if you want to have a gui
 	 */
 	public Jergometer(boolean gui, Context context) {
 		this.gui = gui;
@@ -141,24 +157,26 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 		jergometerSettings = new JergometerSettings();
 
 		// search for updates in the background
-//		if (updatable) {
-//			new Thread(){
-//				public void run() {
-//					checkForUpdates(true);
-//				}
-//			}.start();
-//		}
+		// if (updatable) {
+		// new Thread(){
+		// public void run() {
+		// checkForUpdates(true);
+		// }
+		// }.start();
+		// }
 
-//		programTree = new BikeProgramTree();
+		// programTree = new BikeProgramTree();
 
-//		mainWindow = new MainWindow(I18n.getString("main_window.title", version), this);
-//		mainWindow.getProgramTree().setModel(programTree);
-//		// maximize the main window
-//		mainWindow.setBounds(jergometerSettings.getMainWindowBounds());
-//		mainWindow.setExtendedState(mainWindow.getExtendedState() | jergometerSettings.getMainWindowMaximizedState());
-//		mainWindow.addWindowListener(this);
-//		mainWindow.setVisible(true);
-//		mainWindow.init();
+		// mainWindow = new MainWindow(I18n.getString("main_window.title",
+		// version), this);
+		// mainWindow.getProgramTree().setModel(programTree);
+		// // maximize the main window
+		// mainWindow.setBounds(jergometerSettings.getMainWindowBounds());
+		// mainWindow.setExtendedState(mainWindow.getExtendedState() |
+		// jergometerSettings.getMainWindowMaximizedState());
+		// mainWindow.addWindowListener(this);
+		// mainWindow.setVisible(true);
+		// mainWindow.init();
 
 		setShowOnlyCompletedSessions(true);
 		setSessionsVis(SessionsVis.progression);
@@ -167,7 +185,7 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 
 		new JergometerConsole(this).start();
 
-		Runtime.getRuntime().addShutdownHook(new Thread(){
+		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				quit();
@@ -177,53 +195,75 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 
 	/**
 	 * Checks for JErgometer updates.
-	 *
-	 * @param start true if you want to check for updates without notifications in case there are no new versions
+	 * 
+	 * @param start
+	 *            true if you want to check for updates without notifications in
+	 *            case there are no new versions
 	 */
 	private void checkForUpdates(boolean start) {
 		// check for new version
-//		if (updater.isNewVersionAvailable()) {
-//			// ask user if (s)he wants to update
-//			if (JOptionPane.showConfirmDialog(mainWindow, I18n.getString("msg.new_version_available.want_to_update"),
-//					I18n.getString("msg.updater.title"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-//
-//				// perform update
-//				if (updater.performUpdate(true)) {
-//					// restart the editor
-//					System.exit(255);
-//				}
-//			}
-//		} else {
-//			if (!start) {
-//				JOptionPane.showMessageDialog(mainWindow, I18n.getString("msg.jergometer_is_up-to-date"), I18n.getString("msg.updater.title"), JOptionPane.INFORMATION_MESSAGE);
-//			}
-//		}
+		// if (updater.isNewVersionAvailable()) {
+		// // ask user if (s)he wants to update
+		// if (JOptionPane.showConfirmDialog(mainWindow,
+		// I18n.getString("msg.new_version_available.want_to_update"),
+		// I18n.getString("msg.updater.title"),
+		// JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) ==
+		// JOptionPane.YES_OPTION) {
+		//
+		// // perform update
+		// if (updater.performUpdate(true)) {
+		// // restart the editor
+		// System.exit(255);
+		// }
+		// }
+		// } else {
+		// if (!start) {
+		// JOptionPane.showMessageDialog(mainWindow,
+		// I18n.getString("msg.jergometer_is_up-to-date"),
+		// I18n.getString("msg.updater.title"),
+		// JOptionPane.INFORMATION_MESSAGE);
+		// }
+		// }
 	}
 
 	/**
 	 * Connects to the serial port.
-	 *
-	 * @throws gnu.io.UnsupportedCommOperationException if communication operation is not supported
-	 * @throws java.io.IOException if an I/O error occurs
-	 * @throws org.jergometer.communication.BikeException if the bike communication fails
-	 * @throws org.jergometer.communication.UnconfiguredSerialPortException if the serial port is not configured yet
+	 * 
+	 * @throws gnu.io.UnsupportedCommOperationException
+	 *             if communication operation is not supported
+	 * @throws java.io.IOException
+	 *             if an I/O error occurs
+	 * @throws org.jergometer.communication.BikeException
+	 *             if the bike communication fails
+	 * @throws org.jergometer.communication.UnconfiguredSerialPortException
+	 *             if the serial port is not configured yet
 	 */
-	private void connectToSerialPort() throws BikeException, UnsupportedCommOperationException, IOException, UnconfiguredSerialPortException {
+	private void connectToSerialPort() throws BikeException,
+			UnsupportedCommOperationException, IOException,
+			UnconfiguredSerialPortException {
 		String driver = jergometerSettings.getSerialDriver();
+		Log.d(TAG, "driver " + driver);
 		bikeConnector = BikeConnectors.name2bikeConnector.get(driver);
 
-		String serialPort = jergometerSettings.getSerialPort();
+		String serialPort = "/dev/usb0";// jergometerSettings.getSerialPort();
 		if (serialPort == null) {
 			throw new UnconfiguredSerialPortException();
 		}
 
 		try {
+			((KettlerBikeConnector) bikeConnector).context = context;
 			bikeConnector.connect(serialPort, this);
 		} catch (IOException e) {
-			if (e.getMessage().equals("Cannot run program \"/usr/bin/socat\": java.io.IOException: error=2, No such file or directory")) {
-//				JOptionPane.7showMessageDialog(mainWindow, I18n.getString("msg.socat_not_found"), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+			if (e.getMessage()
+					.equals("Cannot run program \"/usr/bin/socat\": java.io.IOException: error=2, No such file or directory")) {
+				// JOptionPane.7showMessageDialog(mainWindow,
+				// I18n.getString("msg.socat_not_found"),
+				// I18n.getString("error_dialog.title"),
+				// JOptionPane.ERROR_MESSAGE);
 			} else {
-//				JOptionPane.showMessageDialog(mainWindow, e.getMessage(), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+				// JOptionPane.showMessageDialog(mainWindow, e.getMessage(),
+				// I18n.getString("error_dialog.title"),
+				// JOptionPane.ERROR_MESSAGE);
 			}
 			throw e;
 		}
@@ -234,17 +274,18 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	 */
 	private void save() {
 		stopRecording();
-//		jergometerSettings.setMainWindowBounds(mainWindow.getBounds());
-//		jergometerSettings.setMainWindowMaximizedState(mainWindow.getExtendedState() & JFrame.MAXIMIZED_BOTH);
-//		jergometerSettings.save();
+		// jergometerSettings.setMainWindowBounds(mainWindow.getBounds());
+		// jergometerSettings.setMainWindowMaximizedState(mainWindow.getExtendedState()
+		// & JFrame.MAXIMIZED_BOTH);
+		// jergometerSettings.save();
 		userSettings.save();
 	}
 
-
 	/**
 	 * Adds a new user.
-	 *
-	 * @param userName user name
+	 * 
+	 * @param userName
+	 *            user name
 	 */
 	public void newUser(String userName) {
 		if (!jergometerSettings.getUserNames().contains(userName)) {
@@ -255,32 +296,38 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 
 	/**
 	 * Sets the user to the given one.
-	 *
-	 * @param userName user name
+	 * 
+	 * @param userName
+	 *            user name
 	 */
 	public void switchToUser(String userName) {
 		jergometerSettings.setLastUserName(userName);
 		userSettings = new UserSettings(jergometerSettings.getLastUserName());
 		if (userSettings.getLastProgram() != null) {
-//			DefaultMutableTreeNode programNode = getProgramNode(userSettings.getLastProgram());
-//			final TreePath path = new TreePath(programNode.getPath());
-//			SwingUtilities.invokeLater(new Runnable() {
-//				@Override
-//				public void run() {
-//					mainWindow.getProgramTree().expandPath(path);
-//					mainWindow.getProgramTree().getSelectionModel().setSelectionPath(path);
-//					mainWindow.getProgramTree().scrollPathToVisible(path);
-//				}
-//			});
+			// DefaultMutableTreeNode programNode =
+			// getProgramNode(userSettings.getLastProgram());
+			// final TreePath path = new TreePath(programNode.getPath());
+			// SwingUtilities.invokeLater(new Runnable() {
+			// @Override
+			// public void run() {
+			// mainWindow.getProgramTree().expandPath(path);
+			// mainWindow.getProgramTree().getSelectionModel().setSelectionPath(path);
+			// mainWindow.getProgramTree().scrollPathToVisible(path);
+			// }
+			// });
 		}
-		userData = new UserData(jergometerSettings.getLastUserName());//, programTree);
-		String[] userNames = jergometerSettings.getUserNames().toArray(new String[jergometerSettings.getUserNames().size()]);
-//		mainWindow.setUserList(userNames, jergometerSettings.getLastUserName());
+		userData = new UserData(jergometerSettings.getLastUserName());// ,
+																		// programTree);
+		String[] userNames = jergometerSettings.getUserNames().toArray(
+				new String[jergometerSettings.getUserNames().size()]);
+		// mainWindow.setUserList(userNames,
+		// jergometerSettings.getLastUserName());
 		filterSessions();
 	}
 
 	private void filterSessions() {
-		if (!gui || userData == null) return;
+		if (!gui || userData == null)
+			return;
 
 		ArrayList<BikeSession> filteredList = new ArrayList<BikeSession>();
 		for (BikeSession bikeSession : userData.getSessions()) {
@@ -288,7 +335,8 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 				filteredList.add(bikeSession);
 			}
 		}
-//		mainWindow.getSessionTable().setModel(new SessionTableModel(filteredList));
+		// mainWindow.getSessionTable().setModel(new
+		// SessionTableModel(filteredList));
 	}
 
 	/**
@@ -296,10 +344,11 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	 */
 	public void reparseUserData() {
 		try {
-//			ProgressMonitor pm = new ProgressMonitor(mainWindow, I18n.getString("msg.loading_user_sessions"), null, 0, 0);
-//			pm.setMillisToDecideToPopup(200);
-//			pm.setMillisToPopup(0);
-//			userData.setProgressMonitor(pm);
+			// ProgressMonitor pm = new ProgressMonitor(mainWindow,
+			// I18n.getString("msg.loading_user_sessions"), null, 0, 0);
+			// pm.setMillisToDecideToPopup(200);
+			// pm.setMillisToPopup(0);
+			// userData.setProgressMonitor(pm);
 
 			// parse all session files
 			userData.generate();
@@ -308,45 +357,57 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 			// and put them into unknownBikeProgram2Sessions
 			HashMap<String, ArrayList<BikeSession>> unknownBikeProgram2Sessions = new HashMap<String, ArrayList<BikeSession>>();
 			for (BikeSession bikeSession : userData.getSessions()) {
-				BikeProgram bikeProgram = getProgram(bikeSession.getProgramName());
+				BikeProgram bikeProgram = getProgram(bikeSession
+						.getProgramName());
 				if (bikeProgram == null) {
-					ArrayList<BikeSession> affectedBikeSessions = unknownBikeProgram2Sessions.get(bikeSession.getProgramName());
+					ArrayList<BikeSession> affectedBikeSessions = unknownBikeProgram2Sessions
+							.get(bikeSession.getProgramName());
 					if (affectedBikeSessions == null) {
 						affectedBikeSessions = new ArrayList<BikeSession>(1);
-						unknownBikeProgram2Sessions.put(bikeSession.getProgramName(), affectedBikeSessions);
+						unknownBikeProgram2Sessions.put(
+								bikeSession.getProgramName(),
+								affectedBikeSessions);
 					}
 					affectedBikeSessions.add(bikeSession);
 				}
 			}
-//			if (!unknownBikeProgram2Sessions.isEmpty()) {
-//				ChooseNewProgramDialog dialog = new ChooseNewProgramDialog(mainWindow, programTree);
-//				for (String oldProgramName : unknownBikeProgram2Sessions.keySet()) {
-//					dialog.openDialog(oldProgramName);
-//					ChooseNewProgramDialog.Result result = dialog.getResult();
-//					switch (result) {
-//						case assign:
-//							BikeProgram bikeProgram = dialog.getSelectedBikeProgram();
-//							if (bikeProgram != null) {
-//								String newProgramName = bikeProgram.getProgramName();
-//								// save corresponding sessions with new program name
-//								for (BikeSession bikeSession : unknownBikeProgram2Sessions.get(oldProgramName)) {
-//									bikeSession.setProgramName(newProgramName);
-//								}
-//							}
-//							break;
-//						case skip:
-//							continue;
-//						case abort:
-//							break;
-//					}
-//				}
-//			}
+			if (!unknownBikeProgram2Sessions.isEmpty()) {
+				// ChooseNewProgramDialog dialog = new
+				// ChooseNewProgramDialog(mainWindow, programTree);
+				// for (String oldProgramName :
+				// unknownBikeProgram2Sessions.keySet()) {
+				// dialog.openDialog(oldProgramName);
+				// ChooseNewProgramDialog.Result result = dialog.getResult();
+				// switch (result) {
+				// case assign:
+				// BikeProgram bikeProgram = dialog.getSelectedBikeProgram();
+				BikeProgram bikeProgram = getProgram("burkart1.xml");
+				program = bikeProgram;
+				// if (bikeProgram != null) {
+				// String newProgramName = bikeProgram.getProgramName();
+				// // save corresponding sessions with new program name
+				// for (BikeSession bikeSession :
+				// unknownBikeProgram2Sessions.get(oldProgramName)) {
+				// bikeSession.setProgramName(newProgramName);
+				// }
+				// }
+				// break;
+				// case skip:
+				// continue;
+				// case abort:
+				// break;
+				// }
+				// }
+			}
 
 			// check session consistency, correct them and save them if needed
 			for (BikeSession bikeSession : userData.getSessions()) {
-				BikeProgram bikeProgram = getProgram(bikeSession.getProgramName());
-				if (bikeProgram.getProgramData().getDuration() != bikeSession.getProgramDuration()) {
-					bikeSession.setProgramDuration(bikeProgram.getProgramData().getDuration());
+				BikeProgram bikeProgram = getProgram(bikeSession
+						.getProgramName());
+				if (bikeProgram.getProgramData().getDuration() != bikeSession
+						.getProgramDuration()) {
+					bikeSession.setProgramDuration(bikeProgram.getProgramData()
+							.getDuration());
 					bikeSession.recalculateMiniInfo();
 				}
 				if (bikeSession.isNeedToBeSaved()) {
@@ -356,12 +417,14 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 
 			// save the sessions.xml
 			userData.save();
-//			pm.close();
+			// pm.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		String[] userNames = jergometerSettings.getUserNames().toArray(new String[jergometerSettings.getUserNames().size()]);
-//		mainWindow.setUserList(userNames, jergometerSettings.getLastUserName());
+		String[] userNames = jergometerSettings.getUserNames().toArray(
+				new String[jergometerSettings.getUserNames().size()]);
+		// mainWindow.setUserList(userNames,
+		// jergometerSettings.getLastUserName());
 		filterSessions();
 	}
 
@@ -370,54 +433,75 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	 */
 	public void startRecording() {
 		if (!recording) {
-//			if (program == null) {
-//				JOptionPane.showMessageDialog(mainWindow, I18n.getString("msg.choose_a_program"));
-//				return;
-//			}
+			if (program == null) {
+				program = getProgram("burkart1.xml");
+			}
 
 			// clear diagram and draw the bike program
 			selectBikeProgram(program, true);
 
-//			Diagram diagram = mainWindow.getDiagram();
-//			diagram.clearGraphs();
-//			BikeDiagram.createLegend(diagram, false, false, program.getProgramData().getDuration());
+			// Diagram diagram = mainWindow.getDiagram();
+			// diagram.clearGraphs();
+			// BikeDiagram.createLegend(diagram, false, false,
+			// program.getProgramData().getDuration());
 
 			try {
 				connectToSerialPort();
+				Log.d(TAG, "connection established");
 			} catch (BikeException e) {
 				e.printStackTrace();
-//				JOptionPane.showMessageDialog(mainWindow, e.getMessage(), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+				// JOptionPane.showMessageDialog(mainWindow, e.getMessage(),
+				// I18n.getString("error_dialog.title"),
+				// JOptionPane.ERROR_MESSAGE);
 				return;
 			} catch (UnconfiguredSerialPortException e) {
 				e.printStackTrace();
-//				JOptionPane.showMessageDialog(mainWindow, I18n.getString("msg.configure_comport_first"));
-//				mainWindow.openSettingsWindow();
+				// JOptionPane.showMessageDialog(mainWindow,
+				// I18n.getString("msg.configure_comport_first"));
+				// mainWindow.openSettingsWindow();
 			} catch (NoClassDefFoundError e) {
-//				JOptionPane.showMessageDialog(mainWindow, I18n.getString("msg.unsatisfied_link_error"), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+				// JOptionPane.showMessageDialog(mainWindow,
+				// I18n.getString("msg.unsatisfied_link_error"),
+				// I18n.getString("error_dialog.title"),
+				// JOptionPane.ERROR_MESSAGE);
 				return;
 			} catch (UnsatisfiedLinkError e) {
 				e.printStackTrace();
-//				JOptionPane.showMessageDialog(mainWindow, I18n.getString("msg.unsatisfied_link_error"), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+				// JOptionPane.showMessageDialog(mainWindow,
+				// I18n.getString("msg.unsatisfied_link_error"),
+				// I18n.getString("error_dialog.title"),
+				// JOptionPane.ERROR_MESSAGE);
 				return;
 			} catch (Exception e) {
 				e.printStackTrace();
-//				JOptionPane.showMessageDialog(mainWindow, I18n.getString("msg.connection_failed"), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+				// JOptionPane.showMessageDialog(mainWindow,
+				// I18n.getString("msg.connection_failed"),
+				// I18n.getString("error_dialog.title"),
+				// JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
-//			mainWindow.setRecordState(true);
+			// mainWindow.setRecordState(true);
 			recording = true;
 
 			program.newSession();
+			Log.e(TAG, "startRecording");
 
-			communicationTimer = new Timer();
-			TimerTask task = new TimerTask() {
-					public void run() {
-						actionPerformed();
+			handler.postDelayed(new Runnable() {
+				public void run() {
+					Log.e(TAG, "run shortDelay");
+					actionPerformed();
 				}
-			};
-			communicationTimer.scheduleAtFixedRate(task, 500, 500);
-//			communicationTimer.start();
+			}, shortDelay);
+
+			// communicationTimer = new Timer();
+			// TimerTask task = new TimerTask() {
+			// public void run() {
+			// actionPerformed();
+			// }
+			// };
+			// communicationTimer.schedule(task, 500, 500);
+			// communicationTimer.start();
 		}
 	}
 
@@ -450,13 +534,15 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 				}
 			}
 
-//			mainWindow.setRecordState(false);
+			// mainWindow.setRecordState(false);
 			recording = false;
 		}
 	}
 
 	private String getCurrentSessionDir() {
-		return JergometerSettings.jergometerUsersDirName + "/" + jergometerSettings.getLastUserName() + "/sessions";
+		return context.getFilesDir().toString();
+		// return JergometerSettings.jergometerUsersDirName + "/" +
+		// jergometerSettings.getLastUserName() + "/sessions";
 	}
 
 	public void selectBikeProgram(BikeProgram bikeProgram) {
@@ -467,13 +553,13 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 		selectedSessions.clear();
 		program = bikeProgram;
 		sessionFilter.setProgramFilter(bikeProgram);
-//		diagramVisualizer.stopVisualization();
+		// diagramVisualizer.stopVisualization();
 		filterSessions();
 		visualizeBikeProgram(bikeProgram, bright, -1);
 
-		if (userSettings != null) {
-			userSettings.setLastProgram(bikeProgram.getProgramName());
-		}
+		// if (userSettings != null) {
+		// userSettings.setLastProgram(bikeProgram.getProgramName());
+		// }
 	}
 
 	public void selectBikeProgramDirectory(BikeProgramDir bikeProgramDir) {
@@ -486,10 +572,12 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 		filterSessions();
 	}
 
-	private void visualizeBikeProgram(BikeProgram bikeProgram, boolean bright, long duration) {
-//		BikeProgramVisualizer bikeProgramVisualizer = new BikeProgramVisualizer(mainWindow.getDiagram());
-//		diagramVisualizer = bikeProgramVisualizer;
-//		bikeProgramVisualizer.visualize(bikeProgram, bright, duration);
+	private void visualizeBikeProgram(BikeProgram bikeProgram, boolean bright,
+			long duration) {
+		// BikeProgramVisualizer bikeProgramVisualizer = new
+		// BikeProgramVisualizer(mainWindow.getDiagram());
+		// diagramVisualizer = bikeProgramVisualizer;
+		// bikeProgramVisualizer.visualize(bikeProgram, bright, duration);
 	}
 
 	public void selectBikeSession(BikeSession bikeSession) {
@@ -498,7 +586,8 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 		try {
 			visualizeBikeSession(bikeSession);
 		} catch (IOException e) {
-//			JOptionPane.showMessageDialog(mainWindow, e.getMessage(), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+			// JOptionPane.showMessageDialog(mainWindow, e.getMessage(),
+			// I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -507,14 +596,15 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 		try {
 			visualizeBikeSessions(bikeSessions);
 		} catch (IOException e) {
-//			JOptionPane.showMessageDialog(mainWindow, e.getMessage(), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+			// JOptionPane.showMessageDialog(mainWindow, e.getMessage(),
+			// I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	public void deleteSelectedBikeSessions() {
 		for (BikeSession selectedSession : selectedSessions) {
 			this.userData.getSessions().remove(selectedSession);
-			//noinspection ResultOfMethodCallIgnored
+			// noinspection ResultOfMethodCallIgnored
 			selectedSession.getFile().delete();
 		}
 		userData.save();
@@ -523,34 +613,43 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 
 	/**
 	 * Shows a bike session in the diagram.
-	 *
-	 * @param bikeSession bike session
-	 * @throws java.io.IOException if an I/O error occurs
+	 * 
+	 * @param bikeSession
+	 *            bike session
+	 * @throws java.io.IOException
+	 *             if an I/O error occurs
 	 */
-	private void visualizeBikeSession(BikeSession bikeSession) throws IOException {
-//		diagramVisualizer.stopVisualization();
+	private void visualizeBikeSession(BikeSession bikeSession)
+			throws IOException {
+		// diagramVisualizer.stopVisualization();
 
-//		int duration = mainWindow.isShowFullSessionLength() ? bikeSession.getStatsTotal().getDuration() : bikeSession.getProgramDuration();
+		// int duration = mainWindow.isShowFullSessionLength() ?
+		// bikeSession.getStatsTotal().getDuration() :
+		// bikeSession.getProgramDuration();
 
 		// draw the program
 		BikeProgram bikeProgram = getProgram(bikeSession.getProgramName());
 		boolean programFound = bikeProgram != null;
 		if (programFound) {
-			//visualizeBikeProgram(bikeProgram, true, duration);
+			// visualizeBikeProgram(bikeProgram, true, duration);
 		}
 
 		// draw the session
-//		BikeSessionVisualizer bikeSessionVisualizer = new BikeSessionVisualizer(mainWindow.getDiagram());
-//		diagramVisualizer = bikeSessionVisualizer;
-//		bikeSessionVisualizer.visualize(bikeSession, !programFound, mainWindow.isShowFullSessionLength());
+		// BikeSessionVisualizer bikeSessionVisualizer = new
+		// BikeSessionVisualizer(mainWindow.getDiagram());
+		// diagramVisualizer = bikeSessionVisualizer;
+		// bikeSessionVisualizer.visualize(bikeSession, !programFound,
+		// mainWindow.isShowFullSessionLength());
 	}
 
 	private BikeProgram getProgram(String programName) {
 		XMLParser parser = new XMLParser();
 		try {
-			XMLDocument doc = parser.parse(StreamUtils.readXmlStream(context.getAssets().open("burkart1.xml")));
+			XMLDocument doc = parser.parse(StreamUtils.readXmlStream(context
+					.getAssets().open("burkart1.xml")));
 			File file = new File("burkart1.xml");
-			BikeProgram program = new BikeProgram(file, "", new BikeProgramData(doc.getRootElement()));
+			BikeProgram program = new BikeProgram(file, "",
+					new BikeProgramData(doc.getRootElement()));
 			return program;
 		} catch (Exception e) {
 			System.err.println("Error parsing bike program.");
@@ -558,52 +657,66 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 		}
 	}
 
-	private void visualizeBikeSessions(ArrayList<BikeSession> bikeSessions) throws IOException {
-//		diagramVisualizer.stopVisualization();
+	private void visualizeBikeSessions(ArrayList<BikeSession> bikeSessions)
+			throws IOException {
+		// diagramVisualizer.stopVisualization();
 
 		switch (sessionsVis) {
-			case average:
-//				boolean fullLength = mainWindow.isShowFullSessionLength();
+		case average:
+			// boolean fullLength = mainWindow.isShowFullSessionLength();
 
-				// calculate minimal duration
-				int duration = Integer.MAX_VALUE;
+			// calculate minimal duration
+			int duration = Integer.MAX_VALUE;
+			for (BikeSession bikeSession : bikeSessions) {
+				// int thisDuration = fullLength ?
+				// bikeSession.getStatsTotal().getDuration() :
+				// bikeSession.getProgramDuration();
+				// duration = Math.min(duration, thisDuration);
+			}
+
+			BikeSession virtualBikeSession = new BikeSession(bikeSessions
+					.get(0).getProgramName(), duration);
+			virtualBikeSession.initialVirtualBikeSession();
+
+			int sessionCount = bikeSessions.size();
+
+			int pulse,
+			pulseCount,
+			finalPulse,
+			pedalRpm,
+			power;
+			MiniDataRecord data;
+
+			for (int i = 0; i < duration; i++) {
+				// reset values
+				pulse = 0;
+				pulseCount = 0;
+				pedalRpm = 0;
+				power = 0;
+
 				for (BikeSession bikeSession : bikeSessions) {
-//					int thisDuration = fullLength ? bikeSession.getStatsTotal().getDuration() : bikeSession.getProgramDuration();
-//					duration = Math.min(duration, thisDuration);
-				}
-
-				BikeSession virtualBikeSession = new BikeSession(bikeSessions.get(0).getProgramName(), duration);
-				virtualBikeSession.initialVirtualBikeSession();
-
-				int sessionCount = bikeSessions.size();
-
-				int pulse, pulseCount, finalPulse, pedalRpm, power;
-				MiniDataRecord data;
-
-				for (int i = 0; i < duration; i++) {
-					// reset values
-					pulse = 0; pulseCount = 0; pedalRpm = 0; power = 0;
-
-					for (BikeSession bikeSession : bikeSessions) {
-						data = bikeSession.getData().get(i);
-						if (data.getPulse() > 0) {
-							pulse += data.getPulse();
-							pulseCount++;
-						}
-						pedalRpm += data.getPedalRpm();
-						power += data.getPower();
+					data = bikeSession.getData().get(i);
+					if (data.getPulse() > 0) {
+						pulse += data.getPulse();
+						pulseCount++;
 					}
-					finalPulse = pulseCount == 0 ? 0 : pulse/pulseCount;
-
-					virtualBikeSession.getData().add(new MiniDataRecord(finalPulse, power/sessionCount, pedalRpm/sessionCount));
+					pedalRpm += data.getPedalRpm();
+					power += data.getPower();
 				}
-				visualizeBikeSession(virtualBikeSession);
-				break;
-			case progression:
-//				ProgressionVisualizer progressionVisualizer = new ProgressionVisualizer(mainWindow.getDiagram());
-//				diagramVisualizer = progressionVisualizer;
-//				progressionVisualizer.visualize(bikeSessions);
-				break;
+				finalPulse = pulseCount == 0 ? 0 : pulse / pulseCount;
+
+				virtualBikeSession.getData().add(
+						new MiniDataRecord(finalPulse, power / sessionCount,
+								pedalRpm / sessionCount));
+			}
+			visualizeBikeSession(virtualBikeSession);
+			break;
+		case progression:
+			// ProgressionVisualizer progressionVisualizer = new
+			// ProgressionVisualizer(mainWindow.getDiagram());
+			// diagramVisualizer = progressionVisualizer;
+			// progressionVisualizer.visualize(bikeSessions);
+			break;
 		}
 	}
 
@@ -612,32 +725,33 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 	}
 
 	public void setSessionsVis(SessionsVis sessionsVis) {
-//		mainWindow.setSessionsVis(sessionsVis);
+		// mainWindow.setSessionsVis(sessionsVis);
 		this.sessionsVis = sessionsVis;
 
 		if (!selectedSessions.isEmpty()) {
 			try {
 				visualizeBikeSessions(selectedSessions);
 			} catch (IOException e) {
-//				JOptionPane.showMessageDialog(mainWindow, e.getMessage(), I18n.getString("error_dialog.title"), JOptionPane.ERROR_MESSAGE);
+				// JOptionPane.showMessageDialog(mainWindow, e.getMessage(),
+				// I18n.getString("error_dialog.title"),
+				// JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
 	public void setShowOnlyCompletedSessions(boolean value) {
-//		mainWindow.setShowOnlyCompletedSessions(value);
+		// mainWindow.setShowOnlyCompletedSessions(value);
 		sessionFilter.setOnlyCompletedSessions(value);
 
 		filterSessions();
 	}
 
 	public void setShowFullSessionLength(boolean value) {
-//		mainWindow.setShowFullSessionLength(value);
+		// mainWindow.setShowFullSessionLength(value);
 
 		if (selectedSessions.size() == 1) {
 			selectBikeSession(selectedSessions.get(0));
-		} else
-		if (selectedSessions.size() > 1) {
+		} else if (selectedSessions.size() > 1) {
 			selectBikeSessions(selectedSessions);
 		}
 	}
@@ -654,108 +768,117 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 		return jergometerSettings;
 	}
 
-//	public BikeProgramTree getProgramTree() {
-//		return programTree;
-//	}
+	// public BikeProgramTree getProgramTree() {
+	// return programTree;
+	// }
 
 	/**
 	 * Leaves the program.
 	 */
 	public void quit() {
 		save();
-		//mainWindow.dispose();
+		// mainWindow.dispose();
 	}
 
-
-// BikeListener by BikeReader
+	// BikeListener by BikeReader
 	public void bikeAck() {
-		switch(state) {
-			case hello:
-				state = State.connected;
-				break;
-			case reset:
-				state = State.hello;
-				break;
+		switch (state) {
+		case hello:
+			Log.d(TAG, "bikeAck hello");
+			state = State.connected;
+			break;
+		case reset:
+			Log.d(TAG, "bikeAck reset");
+			state = State.hello;
+			break;
 		}
 	}
 
 	public void bikeData(DataRecord data) {
-//		mainWindow.setData(data);
+		// mainWindow.setData(data);
 
-//		Diagram diagram = mainWindow.getDiagram();
+		// Diagram diagram = mainWindow.getDiagram();
 
 		// extends time range when we are at the end
-//		if (program.getSession().getDurationPulse() >= diagram.getTimeRange().max) {
-//			long newMax = diagram.getTimeRange().max + (program.getProgramData().getDuration() / 2);
-//			diagram.setTimeRange(new Diagram.Range(0, newMax));
-//			diagram.redrawImage();
-//		}
+		// if (program.getSession().getDurationPulse() >=
+		// diagram.getTimeRange().max) {
+		// long newMax = diagram.getTimeRange().max +
+		// (program.getProgramData().getDuration() / 2);
+		// diagram.setTimeRange(new Diagram.Range(0, newMax));
+		// diagram.redrawImage();
+		// }
 
-		
-//		if (program.getSession().getDuration() < diagram.getTimeRange().max) {
-//			int time = program.getSession().getDuration();
-//			diagram.addValue("pulse", time, data.getPulse());
-//			diagram.addValue("pedalRPM", time, data.getPedalRpm());
-//			diagram.addValue("power", time, data.getRealPower());
-//		}
-		
+		// if (program.getSession().getDuration() < diagram.getTimeRange().max)
+		// {
+		// int time = program.getSession().getDuration();
+		// diagram.addValue("pulse", time, data.getPulse());
+		// diagram.addValue("pedalRPM", time, data.getPedalRpm());
+		// diagram.addValue("power", time, data.getRealPower());
+		// }
 
 		// add new data record to session
 		switch (program.update(data)) {
-			case cycle:
-				// user is cycling -> remove session end marker if added
-//				if (sessionEndMarker != null) {
-//					diagram.removeVerticalMarker(sessionEndMarker);
-//					diagram.clearGraph("pulse-end");
-//					diagram.redrawImage();
-//					diagram.repaint();
-//					sessionEndMarker = null;
-//				}
+		case cycle:
+			// user is cycling -> remove session end marker if added
+			// if (sessionEndMarker != null) {
+			// diagram.removeVerticalMarker(sessionEndMarker);
+			// diagram.clearGraph("pulse-end");
+			// diagram.redrawImage();
+			// diagram.repaint();
+			// sessionEndMarker = null;
+			// }
 
-				int time = program.getSession().getDuration();
-				ProgressBar hrBar = (ProgressBar)((Activity)context).findViewById(R.id.heartrateBar);
-				hrBar.setProgress(data.getPulse());
-//				diagram.addValue("pulse", time, data.getPulse());
-				TextView rpm = (TextView)((Activity)context).findViewById(R.id.rpm);
-				rpm.setText(data.getPedalRpm());
-//				diagram.addValue("pedalRPM", time, data.getPedalRpm());
-				ProgressBar powerBar = (ProgressBar)((Activity)context).findViewById(R.id.powerBar);
-				powerBar.setProgress(data.getRealPower());
-//				diagram.addValue("power", time, data.getRealPower());
+			int time = program.getSession().getDuration();
+			ProgressBar hrBar = (ProgressBar) ((Activity) context)
+					.findViewById(R.id.heartrateBar);
+			hrBar.setProgress(data.getPulse());
+			// diagram.addValue("pulse", time, data.getPulse());
+			TextView rpm = (TextView) ((Activity) context)
+					.findViewById(R.id.rpm);
+			rpm.setText("" + data.getPedalRpm());
+			// diagram.addValue("pedalRPM", time, data.getPedalRpm());
+			ProgressBar powerBar = (ProgressBar) ((Activity) context)
+					.findViewById(R.id.powerBar);
+			powerBar.setProgress(data.getRealPower());
+			// diagram.addValue("power", time, data.getRealPower());
 
-				power = program.getPower();
-				try {
-					if (power != data.getDestPower()) {
-						bikeConnector.sendSetPower(power);
-					}
-				} catch (IOException ignored) {
+			power = program.getPower();
+			try {
+				if (power != data.getDestPower()) {
+					bikeConnector.sendSetPower(power);
 				}
-//				mainWindow.setProgramAction(program.getProgramAction());
-				break;
+			} catch (IOException ignored) {
+			}
+			// mainWindow.setProgramAction(program.getProgramAction());
+			break;
 
-			case pulse:
-				// user is not cycling -> add session end marker if not already added
-//				if (sessionEndMarker == null) {
-//					int endTime = program.getSession().getStatsTotal().getDuration();
-//					sessionEndMarker = new Diagram.Marker(endTime, new Color(196, 196, 0), new BasicStroke(), "session end");
-//					diagram.addVerticalMarker(sessionEndMarker);
-//					diagram.repaint();
-//					
-//					time = program.getSession().getDuration();
-//					for (Integer pulse : program.getSession().getPulseAfterSession()) {
-//						diagram.addValue("pulse-end", ++time, pulse);
-//					}
-//				} else {
-//					time = program.getSession().getDurationPulse();
-//					diagram.addValue("pulse-end", time, data.getPulse());
-//				}
-//				mainWindow.setProgramAction(I18n.getString("action.recording_pulse"));
-//				break;
+		case pulse:
+			// user is not cycling -> add session end marker if not already
+			// added
+			// if (sessionEndMarker == null) {
+			// int endTime = program.getSession().getStatsTotal().getDuration();
+			// sessionEndMarker = new Diagram.Marker(endTime, new Color(196,
+			// 196, 0), new BasicStroke(), "session end");
+			// diagram.addVerticalMarker(sessionEndMarker);
+			// diagram.repaint();
+			//
+			// time = program.getSession().getDuration();
+			// for (Integer pulse : program.getSession().getPulseAfterSession())
+			// {
+			// diagram.addValue("pulse-end", ++time, pulse);
+			// }
+			// } else {
+			// time = program.getSession().getDurationPulse();
+			// diagram.addValue("pulse-end", time, data.getPulse());
+			// }
+			// mainWindow.setProgramAction(I18n.getString("action.recording_pulse"));
+			// break;
 		}
 	}
 
 	public void bikeError() {
 		System.err.println("Bike: ERROR");
+		Log.d(TAG, "Bike: ERROR");
 	}
 
 	@Override
@@ -767,50 +890,65 @@ public class Jergometer implements BikeListener{//, ActionListener, WindowListen
 
 	// ActionListener by communicationTimer
 	public void actionPerformed() {
-//		if (e.getSource() == communicationTimer) {
-			try {
-				// FSM
-				switch(state) {
-					case notConnected:
-						state = State.reset;
-						bikeConnector.sendReset();
-						break;
-					case hello:
-						bikeConnector.sendHello();
-						break;
-					case reset:
-						bikeConnector.sendReset();
-						break;
-					case connected:
-						bikeConnector.sendGetData();
-						break;
-				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
+		// if (e.getSource() == communicationTimer) {
+		try {
+			// FSM
+			long delay = shortDelay;
+			switch (state) {
+			case notConnected:
+				Log.d(TAG, "not connected");
+				state = State.reset;
+				bikeConnector.sendReset();
+				delay = longDelay;
+				break;
+			case hello:
+				Log.d(TAG, "hello");
+				bikeConnector.sendHello();
+				break;
+			case reset:
+				Log.d(TAG, "reset");
+				bikeConnector.sendReset();
+				delay = longDelay;
+				break;
+			case connected:
+				Log.d(TAG, "connected");
+				bikeConnector.sendGetData();
+				break;
 			}
-//		}
+			if (recording) {
+				handler.postDelayed(new Runnable() {
+					public void run() {
+						Log.e(TAG, "run action ");
+						actionPerformed();
+					}
+				}, delay);
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		// }
 	}
 
-// WindowListener by mainWindow
-//	public void windowOpened(WindowEvent e) {
-//	}
-//
-//	public void windowClosing(WindowEvent e) {
-//		System.exit(0);
-//	}
-//
-//	public void windowClosed(WindowEvent e) {
-//	}
-//
-//	public void windowIconified(WindowEvent e) {
-//	}
-//
-//	public void windowDeiconified(WindowEvent e) {
-//	}
-//
-//	public void windowActivated(WindowEvent e) {
-//	}
-//
-//	public void windowDeactivated(WindowEvent e) {
-//	}
+	// WindowListener by mainWindow
+	// public void windowOpened(WindowEvent e) {
+	// }
+	//
+	// public void windowClosing(WindowEvent e) {
+	// System.exit(0);
+	// }
+	//
+	// public void windowClosed(WindowEvent e) {
+	// }
+	//
+	// public void windowIconified(WindowEvent e) {
+	// }
+	//
+	// public void windowDeiconified(WindowEvent e) {
+	// }
+	//
+	// public void windowActivated(WindowEvent e) {
+	// }
+	//
+	// public void windowDeactivated(WindowEvent e) {
+	// }
 }
