@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Chronometer;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -520,6 +521,13 @@ public class Jergometer implements BikeListener {// , ActionListener,
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
+			Chronometer timeView = (Chronometer)((Activity)context).findViewById(R.id.time);
+			try {
+				timeView.stop();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
 			if (program != null && program.getSession() != null) {
 				try {
 					// save session file
@@ -786,6 +794,8 @@ public class Jergometer implements BikeListener {// , ActionListener,
 		case hello:
 			Log.d(TAG, "bikeAck hello");
 			state = State.connected;
+			Chronometer timeView = (Chronometer)((Activity)context).findViewById(R.id.time);
+			timeView.start();
 			break;
 		case reset:
 			Log.d(TAG, "bikeAck reset");
@@ -832,6 +842,7 @@ public class Jergometer implements BikeListener {// , ActionListener,
 			ProgressBar hrBar = (ProgressBar) ((Activity) context)
 					.findViewById(R.id.heartrateBar);
 			hrBar.setProgress(data.getPulse());
+			hrBar.setMax(220);
 			// diagram.addValue("pulse", time, data.getPulse());
 			TextView rpm = (TextView) ((Activity) context)
 					.findViewById(R.id.rpm);
@@ -841,6 +852,11 @@ public class Jergometer implements BikeListener {// , ActionListener,
 					.findViewById(R.id.powerBar);
 			powerBar.setProgress(data.getRealPower());
 			// diagram.addValue("power", time, data.getRealPower());
+//			Chronometer timeView = (Chronometer)((Activity)context).findViewById(R.id.time);
+//			timeView.setText(data.getTime());
+			
+			TextView dist = (TextView)((Activity)context).findViewById(R.id.trip);
+			dist.setText("" + data.getDistance());
 
 			power = program.getPower();
 			try {
