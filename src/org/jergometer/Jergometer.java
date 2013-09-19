@@ -794,8 +794,14 @@ public class Jergometer implements BikeListener {// , ActionListener,
 		case hello:
 			Log.d(TAG, "bikeAck hello");
 			state = State.connected;
-			Chronometer timeView = (Chronometer)((Activity)context).findViewById(R.id.time);
-			timeView.start();
+			final Chronometer timeView = (Chronometer)((Activity)context).findViewById(R.id.time);
+			((Activity)context).runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					timeView.start();
+				}
+			});
 			break;
 		case reset:
 			Log.d(TAG, "bikeAck reset");
