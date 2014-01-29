@@ -860,9 +860,10 @@ public class Jergometer implements BikeListener {// , ActionListener,
 			// diagram.addValue("power", time, data.getRealPower());
 //			Chronometer timeView = (Chronometer)((Activity)context).findViewById(R.id.time);
 //			timeView.setText(data.getTime());
-			
+			// Distance is in 100m so we divide by 10 to get km
 			TextView dist = (TextView)((Activity)context).findViewById(R.id.trip);
-			dist.setText("" + data.getDistance());
+			double ldist = data.getDistance() / 10.0;
+			dist.setText("" + ldist);
 
 			power = program.getPower();
 			try {
